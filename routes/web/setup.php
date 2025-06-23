@@ -38,8 +38,8 @@ Route::middleware(['no.http.cache'])
 		Route::middleware(['install'])
 			->prefix('install')
 			->group(function () {
-				Route::get('/', StartingController::class);
-				Route::get('system_requirements', RequirementsController::class);
+                                Route::get('/', [StartingController::class, '__invoke']);
+                                Route::get('system_requirements', [RequirementsController::class, '__invoke']);
 				Route::controller(SiteInfoController::class)
 					->group(function () {
 						Route::get('site_info', 'showForm');
@@ -55,7 +55,7 @@ Route::middleware(['no.http.cache'])
 						Route::get('database_import', 'showForm');
 						Route::post('database_import', 'postForm');
 					});
-				Route::get('cron_jobs', CronController::class);
-				Route::get('finish', FinishController::class);
+                                Route::get('cron_jobs', [CronController::class, '__invoke']);
+                                Route::get('finish', [FinishController::class, '__invoke']);
 			});
 	});
