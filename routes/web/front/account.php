@@ -93,10 +93,9 @@ Route::middleware($accountMiddlewares)
 				Route::get('{id}/payment/cancel', 'paymentCancel');
 			});
 		
-		// Transactions
-		Route::namespace('Transactions')
-			->prefix('transactions')
-			->group(function ($router) {
+                // Transactions
+                Route::prefix('transactions')
+                        ->group(function ($router) {
 				Route::get('promotion', [TransactionsController::class, 'index']);
 				Route::get('subscription', [TransactionsController::class, 'index']);
 			});

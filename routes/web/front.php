@@ -49,13 +49,10 @@ $isDomainmappingAvailable = (plugin_exists('domainmapping') && plugin_installed_
 
 // ACCOUNT
 $accountBasePath = urlGen()->getAccountBasePath();
-Route::namespace('Account')->prefix($accountBasePath)->group(__DIR__ . '/front/account.php');
+Route::prefix($accountBasePath)->group(__DIR__ . '/front/account.php');
 
 // Select Language
-Route::namespace('Locale')
-	->group(function ($router) {
-		Route::get('locale/{code}', [LocaleController::class, 'setLocale']);
-	});
+Route::get('locale/{code}', [LocaleController::class, 'setLocale']);
 
 // FILES
 Route::controller(FileController::class)
@@ -88,8 +85,7 @@ if (!doesCountriesPageCanBeHomepage()) {
 
 
 // POSTS
-Route::namespace('Post')
-	->group(function ($router) {
+Route::group(function ($router) {
 		$router->pattern('id', '[0-9]+');
 		
 		$hidPrefix = config('larapen.core.hashableIdPrefix');
@@ -114,8 +110,7 @@ Route::namespace('Post')
 		}
 		
 		// SingleStep Listing creation
-		Route::namespace('CreateOrEdit\SingleStep')
-			->controller(SingleCreateController::class)
+                Route::controller(SingleCreateController::class)
 			->group(function ($router) {
 				Route::get('create', 'showForm');
 				Route::post('create', 'postForm');
@@ -128,8 +123,7 @@ Route::namespace('Post')
 			});
 		
 		// MultiSteps Listing creation
-		Route::namespace('CreateOrEdit\MultiSteps')
-			->group(function ($router) {
+		Route::group(function ($router) {
 				Route::controller(CreatePostController::class)
 					->group(function ($router) {
 						Route::get('posts/create', 'showForm');
@@ -165,8 +159,7 @@ Route::namespace('Post')
 				$router->pattern('id', '[0-9]+');
 				
 				// SingleStep Listing edition
-				Route::namespace('CreateOrEdit\SingleStep')
-					->controller(SingleEditController::class)
+				Route::controller(SingleEditController::class)
 					->group(function ($router) {
 						Route::get('edit/{id}', 'showForm');
 						Route::put('edit/{id}', 'postForm');
@@ -178,8 +171,7 @@ Route::namespace('Post')
 					});
 				
 				// MultiSteps Listing Edition
-				Route::namespace('CreateOrEdit\MultiSteps')
-					->group(function ($router) {
+				Route::group(function ($router) {
 						Route::controller(EditPostController::class)
 							->group(function ($router) {
 								Route::get('posts/{id}/details', 'showForm');
@@ -274,8 +266,7 @@ if (!$isDomainmappingAvailable) {
 
 
 // PAGES
-Route::namespace('Page')
-	->group(function ($router) {
+Route::group(function ($router) {
 		Route::get(dynamicRoute('routes.pricing'), [PricingController::class, 'index']);
 		Route::get(dynamicRoute('routes.pageBySlug'), [CmsController::class, 'index']);
 		Route::controller(ContactController::class)
@@ -289,8 +280,7 @@ Route::namespace('Page')
 Route::get(dynamicRoute('routes.sitemap'), SitemapController::class);
 
 // SEARCH
-Route::namespace('Search')
-	->group(function ($router) {
+Route::group(function ($router) {
 		$router->pattern('id', '[0-9]+');
 		$router->pattern('username', '[a-zA-Z0-9]+');
 		Route::get(dynamicRoute('routes.search'), [SearchController::class, 'index']);
