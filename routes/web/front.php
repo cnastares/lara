@@ -238,7 +238,7 @@ Route::prefix('browsing')
 			});
                 // Location
                 $router->pattern('countryCode', getCountryCodeRoutePattern());
-                Route::post('countries/{countryCode}/cities/autocomplete', AutoCompleteController::class);
+                Route::post('countries/{countryCode}/cities/autocomplete', [AutoCompleteController::class, '__invoke']);
                 Route::controller(SelectBoxController::class)
                         ->group(function ($router) {
                                 $router->pattern('id', '[0-9]+');
