@@ -24,50 +24,61 @@ use Larapen\LaravelMetaTags\Facades\MetaTag;
 
 class FinishController extends BaseController
 {
-	/**
-	 * End of the steps (Confirmation)
-	 *
-	 * @param \Illuminate\Http\Request $request
-	 * @return \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
-	 */
-	public function __invoke(Request $request)
-	{
-		if (!session()->has('message')) {
-			return redirect()->to('/');
-		}
-		
-		// Clear the step wizard
-		if (session()->has('postId')) {
-			// Get the Post
-			$post = Post::query()
-				->withoutGlobalScopes([VerifiedScope::class, ReviewedScope::class])
-				->where('id', session('postId'))
-				->first();
-			
-			abort_if(empty($post), 404, t('post_not_found'));
-			
-			session()->forget('postId');
-		}
-		
-		$emailVerificationEnabled = (config('settings.mail.email_verification') == '1');
-		$phoneVerificationEnabled = (config('settings.sms.phone_verification') == '1');
-		$doesVerificationIsDisabled = (!$emailVerificationEnabled && !$phoneVerificationEnabled);
-		
-		// Redirect to the Post,
-		// - If User is logged
-		// - Or if Email and Phone verification option is not activated
-		if (auth()->check() || $doesVerificationIsDisabled) {
-			if (!empty($post)) {
-				flash(session('message'))->success();
-				
-				return redirect()->to(urlGen()->post($post));
-			}
-		}
-		
-		// Meta Tags
-		MetaTag::set('title', session('message'));
-		MetaTag::set('description', session('message'));
-		
-		return view('front.post.createOrEdit.multiSteps.create.finish');
-	}
+        /**
+         * End of the steps (Confirmation)
+         *
+         * @param \Illuminate\Http\Request $request
+         * @return \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
+         */
+        public function __invoke(Request $request)
+        {
+                return $this->finish($request);
+        }
+
+        /**
+         * Confirmation
+         *
+         * @param \Illuminate\Http\Request $request
+         * @return \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
+         */
+        public function finish(Request $request)
+        {
+                if (!session()->has('message')) {
+                        return redirect()->to('/');
+                }
+
+                // Clear the step wizard
+                if (session()->has('postId')) {
+                        // Get the Post
+                        $post = Post::query()
+                                ->withoutGlobalScopes([VerifiedScope::class, ReviewedScope::class])
+                                ->where('id', session('postId'))
+                                ->first();
+
+                        abort_if(empty($post), 404, t('post_not_found'));
+
+                        session()->forget('postId');
+                }
+
+                $emailVerificationEnabled = (config('settings.mail.email_verification') == '1');
+                $phoneVerificationEnabled = (config('settings.sms.phone_verification') == '1');
+                $doesVerificationIsDisabled = (!$emailVerificationEnabled && !$phoneVerificationEnabled);
+
+                // Redirect to the Post,
+                // - If User is logged
+                // - Or if Email and Phone verification option is not activated
+                if (auth()->check() || $doesVerificationIsDisabled) {
+                        if (!empty($post)) {
+                                flash(session('message'))->success();
+
+                                return redirect()->to(urlGen()->post($post));
+                        }
+                }
+
+                // Meta Tags
+                MetaTag::set('title', session('message'));
+                MetaTag::set('description', session('message'));
+
+                return view('front.post.createOrEdit.multiSteps.create.finish');
+        }
 }
