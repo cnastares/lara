@@ -380,6 +380,24 @@ class PhotoController extends BaseController
                         'request_data' => $request->except(['_token', 'pictures'])
                 ]);
 
+                \Log::debug('Detailed file analysis', [
+                        'total_files' => is_countable($request->file('pictures')) ? count($request->file('pictures')) : 0,
+                        'file_details' => array_map(function ($file, $index) {
+                                return [
+                                        'index'           => $index,
+                                        'name'            => $file->getClientOriginalName(),
+                                        'size'            => $file->getSize(),
+                                        'mime'            => $file->getMimeType(),
+                                        'pathname'        => $file->getPathname(),
+                                        'pathname_empty'  => empty($file->getPathname()),
+                                        'realpath'        => $file->getRealPath(),
+                                        'realpath_empty'  => empty($file->getRealPath()),
+                                        'is_valid'        => $file->isValid(),
+                                        'error_code'      => $file->getError(),
+                                ];
+                        }, is_array($request->file('pictures')) ? $request->file('pictures') : [], array_keys(is_array($request->file('pictures')) ? $request->file('pictures') : []))
+                ]);
+
                 if (!$request->hasFile('pictures')) {
                         \Log::warning('No pictures in upload request');
 
@@ -411,6 +429,22 @@ class PhotoController extends BaseController
                         try {
                                 $tempPath = $file->getPathname();
 
+                                // VALIDACIÓN CRÍTICA: Verificar que el path no esté vacío
+                                if (empty($tempPath) || !is_string($tempPath)) {
+                                        \Log::error('Empty or invalid temp path', [
+                                                'file'       => $file->getClientOriginalName(),
+                                                'path'       => $tempPath,
+                                                'path_type'  => gettype($tempPath),
+                                                'temp_name'  => $file->getFilename(),
+                                                'size'       => $file->getSize(),
+                                        ]);
+
+                                        $tempPath = $file->getRealPath();
+                                        if (empty($tempPath)) {
+                                                return response()->json(['error' => 'No se puede acceder al archivo temporal: ' . $file->getClientOriginalName()], 422);
+                                        }
+                                }
+
                                 if (!is_file($tempPath) || !is_readable($tempPath)) {
                                         \Log::warning('Temporary file missing or unreadable', [
                                                 'file'     => $file->getClientOriginalName(),
@@ -420,27 +454,54 @@ class PhotoController extends BaseController
                                                 'size'     => $file->getSize(),
                                         ]);
 
-                                        return response()->json(['error' => 'El archivo temporal no se encuentra disponible.'], 422);
+                                        return response()->json(['error' => 'El archivo temporal no se encuentra disponible: ' . $file->getClientOriginalName()], 422);
                                 }
 
+                                // PROCESAR ARCHIVO MANUALMENTE sin usar Storage::putFileAs()
                                 $fileName = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-                                $tempStoragePath = 'temp/' . $fileName;
+                                $tempStoragePath = storage_path('app/temp/' . $fileName);
 
-                                Storage::putFileAs('temp', $file, $fileName);
+                                $tempDir = dirname($tempStoragePath);
+                                if (!is_dir($tempDir)) {
+                                        mkdir($tempDir, 0755, true);
+                                }
+
+                                if (!copy($tempPath, $tempStoragePath)) {
+                                        \Log::error('Failed to copy temporary file', [
+                                                'source'        => $tempPath,
+                                                'destination'   => $tempStoragePath,
+                                                'source_exists' => file_exists($tempPath),
+                                                'dest_writable' => is_writable($tempDir),
+                                        ]);
+                                        return response()->json(['error' => 'Error al procesar el archivo: ' . $file->getClientOriginalName()], 422);
+                                }
+
+                                if (!file_exists($tempStoragePath)) {
+                                        \Log::error('File copy verification failed', [
+                                                'destination' => $tempStoragePath,
+                                                'source_size' => filesize($tempPath),
+                                                'file'        => $file->getClientOriginalName(),
+                                        ]);
+                                        return response()->json(['error' => 'Error en la verificación del archivo copiado'], 422);
+                                }
 
                                 $uploadedFiles[] = [
                                         'original_name' => $file->getClientOriginalName(),
                                         'temp_name'     => $fileName,
-                                        'temp_path'     => $tempStoragePath,
+                                        'temp_path'     => 'temp/' . $fileName,
+                                        'full_path'     => $tempStoragePath,
                                         'size'          => $file->getSize(),
                                         'mime_type'     => $file->getMimeType(),
                                 ];
 
-                                \Log::info('File successfully processed', [
-                                        'original'  => $file->getClientOriginalName(),
-                                        'temp_name' => $fileName,
-                                        'size'      => $file->getSize(),
+                                \Log::info('File successfully processed manually', [
+                                        'original'     => $file->getClientOriginalName(),
+                                        'temp_name'    => $fileName,
+                                        'size'         => filesize($tempStoragePath),
+                                        'source_path'  => $tempPath,
+                                        'destination'  => $tempStoragePath,
                                 ]);
+
                         } catch (\Exception $e) {
                                 \Log::error('Error processing file', [
                                         'file'  => $file->getClientOriginalName(),
@@ -451,9 +512,29 @@ class PhotoController extends BaseController
                         }
                 }
 
+                $this->cleanupOldTempFiles();
+
                 return response()->json([
                         'message' => 'Archivos subidos correctamente',
                         'files'   => $uploadedFiles,
                 ], 200);
+        }
+
+        private function cleanupOldTempFiles()
+        {
+                $tempDir = storage_path('app/temp');
+                if (!is_dir($tempDir)) {
+                        return;
+                }
+
+                $files = glob($tempDir . '/*');
+                $now = time();
+
+                foreach ($files as $file) {
+                        if (is_file($file) && ($now - filemtime($file)) >= 3600) {
+                                unlink($file);
+                                \Log::debug('Cleaned old temp file', ['file' => basename($file)]);
+                        }
+                }
         }
 }
