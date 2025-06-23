@@ -42,6 +42,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use NotificationChannels\Twilio\TwilioChannel;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class PostService extends BaseService
@@ -219,8 +220,13 @@ class PostService extends BaseService
 		}
 		
 		// Confirmation
-		if ($res) {
-			$data['success'] = true;
+                if ($res) {
+                        $data['success'] = true;
+
+                        Log::info('Post deleted', [
+                                'post_ids' => $ids,
+                                'user_id' => $authUser->getAuthIdentifier(),
+                        ]);
 			
 			$count = count($ids);
 			if ($count > 1) {

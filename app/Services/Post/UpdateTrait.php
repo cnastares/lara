@@ -26,6 +26,7 @@ use App\Notifications\PostRepublished;
 use App\Services\Post\Update\MultiStepsForm;
 use App\Services\Post\Update\SingleStepForm;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 trait UpdateTrait
@@ -67,11 +68,16 @@ trait UpdateTrait
 			$archivedPostsExpiration = (int)config('settings.cron.manually_archived_listings_expiration', 180);
 			
 			// Send Confirmation Email or SMS
-			try {
-				$post->notify(new PostArchived($post, $archivedPostsExpiration));
-			} catch (Throwable $e) {
-				return apiResponse()->error($e->getMessage());
-			}
+                        try {
+                                $post->notify(new PostArchived($post, $archivedPostsExpiration));
+                        } catch (Throwable $e) {
+                                Log::error('Post archive notification failed', [
+                                        'post_id' => $post->id,
+                                        'error' => $e->getMessage(),
+                                ]);
+
+                                return apiResponse()->error($e->getMessage());
+                        }
 			
 			// Get delete date
 			$willBeDeletedAt = $post->archived_at->addDays($archivedPostsExpiration);
@@ -153,11 +159,16 @@ trait UpdateTrait
 		
 		if (empty($post->archived_at)) {
 			// Send Confirmation Email or SMS
-			try {
-				$post->notify(new PostRepublished($post));
-			} catch (Throwable $e) {
-				return apiResponse()->error($e->getMessage());
-			}
+                        try {
+                                $post->notify(new PostRepublished($post));
+                        } catch (Throwable $e) {
+                                Log::error('Post republish notification failed', [
+                                        'post_id' => $post->id,
+                                        'error' => $e->getMessage(),
+                                ]);
+
+                                return apiResponse()->error($e->getMessage());
+                        }
 			
 			$data = [
 				'success' => true,

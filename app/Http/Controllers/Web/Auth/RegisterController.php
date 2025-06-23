@@ -23,6 +23,7 @@ use App\Services\UserService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Larapen\LaravelMetaTags\Facades\MetaTag;
+use Illuminate\Support\Facades\Log;
 
 class RegisterController extends FrontController
 {
@@ -82,9 +83,13 @@ class RegisterController extends FrontController
 		$message = data_get($data, 'message', t('unknown_error'));
 		
 		// Notification Message
-		if (data_get($data, 'success')) {
-			session()->put('message', $message);
-		} else {
+                if (data_get($data, 'success')) {
+                        session()->put('message', $message);
+                        Log::info('User registered', [
+                                'user_id' => data_get($data, 'result.id'),
+                                'ip' => $request->ip(),
+                        ]);
+                } else {
 			flash($message)->error();
 			
 			return redirect()->back()->withErrors(['error' => $message])->withInput();

@@ -25,6 +25,7 @@ use App\Models\Scopes\ReviewedScope;
 use App\Models\Scopes\VerifiedScope;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 trait MakePayment
@@ -87,12 +88,16 @@ trait MakePayment
 						// return $plugin->class::{'sendPayment'}($request, $payable, $resData);
 						return call_user_func($plugin->class . '::sendPayment', $request, $payable, $resData);
 						
-					} catch (Throwable $e) {
-						$resData['extra']['payment']['message'] = $e->getMessage();
-						$resData['extra']['previousUrl'] = $this->apiUri['previousUrl'] . '?error=pluginLoading';
-						
-						return apiResponse()->json($resData, 400);
-					}
+                                        } catch (Throwable $e) {
+                                                Log::error('Payment plugin error', [
+                                                        'error' => $e->getMessage(),
+                                                ]);
+
+                                                $resData['extra']['payment']['message'] = $e->getMessage();
+                                                $resData['extra']['previousUrl'] = $this->apiUri['previousUrl'] . '?error=pluginLoading';
+
+                                                return apiResponse()->json($resData, 400);
+                                        }
 				} else {
 					$resData['extra']['payment']['message'] = t('plugin_not_found');
 					$resData['extra']['previousUrl'] = $this->apiUri['previousUrl'] . '?error=pluginNotFound';
@@ -202,11 +207,15 @@ trait MakePayment
 		try {
 			// return $plugin->class::{'paymentConfirmation'}($payable, $params);
 			return call_user_func($plugin->class . '::paymentConfirmation', $payable, $params);
-		} catch (Throwable $e) {
-			flash($e->getMessage())->error();
-			
-			return redirect()->to('/?error=paymentMethodPluginError');
-		}
+                } catch (Throwable $e) {
+                        Log::error('Payment confirmation error', [
+                                'error' => $e->getMessage(),
+                        ]);
+
+                        flash($e->getMessage())->error();
+
+                        return redirect()->to('/?error=paymentMethodPluginError');
+                }
 	}
 	
 	/**

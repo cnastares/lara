@@ -23,6 +23,7 @@ use App\Models\Scopes\VerifiedScope;
 use App\Models\User;
 use App\Services\Auth\App\Notifications\AccountCreatedWithPassword;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 trait AutoRegistrationTrait
@@ -127,10 +128,14 @@ trait AutoRegistrationTrait
 		// Send Generated Password by Email or SMS
 		try {
 			$user->notify(new AccountCreatedWithPassword($user, $randomPassword));
-		} catch (Throwable $e) {
-			$data['success'] = false;
-			$data['message'] = $e->getMessage();
-		}
+                } catch (Throwable $e) {
+                        Log::error('Auto registration notification failed', [
+                                'error' => $e->getMessage(),
+                        ]);
+
+                        $data['success'] = false;
+                        $data['message'] = $e->getMessage();
+                }
 		
 		return $data;
 	}

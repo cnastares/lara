@@ -32,6 +32,7 @@ use App\Notifications\PostDeleted;
 use App\Notifications\PostWilBeDeleted;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class ListingsPurge extends Command
@@ -265,9 +266,10 @@ class ListingsPurge extends Command
 					try {
 						// Send Notification Email to the Author
 						$post->notify(new PostArchived($post, $this->archivedPostsExpiration));
-					} catch (Throwable $e) {
-						$msg = $e->getMessage() . PHP_EOL;
-						$this->cmdLogger($msg);
+                                        } catch (Throwable $e) {
+                                                Log::error('Notification failed', [
+                                                        'error' => $e->getMessage(),
+                                                ]);
 					}
 				}
 			}
@@ -316,9 +318,10 @@ class ListingsPurge extends Command
 				if (empty($post->deletion_mail_sent_at) || $daysSinceListingDeletionMailHasBeenSent >= $intervalOfSending) {
 					try {
 						$post->notify(new PostWilBeDeleted($post, $daysEarlier));
-					} catch (Throwable $e) {
-						$msg = $e->getMessage() . PHP_EOL;
-						$this->cmdLogger($msg);
+                                        } catch (Throwable $e) {
+                                                Log::error('Notification failed', [
+                                                        'error' => $e->getMessage(),
+                                                ]);
 					}
 					
 					// Update the field 'deletion_mail_sent_at' with today timestamp
@@ -334,9 +337,10 @@ class ListingsPurge extends Command
 				try {
 					// Send Notification Email to the Author
 					$post->notify(new PostDeleted($post));
-				} catch (Throwable $e) {
-					$msg = $e->getMessage() . PHP_EOL;
-					$this->cmdLogger($msg);
+                                } catch (Throwable $e) {
+                                        Log::error('Notification failed', [
+                                                'error' => $e->getMessage(),
+                                        ]);
 				}
 			}
 			
