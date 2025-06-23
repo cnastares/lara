@@ -25,7 +25,7 @@ use App\Http\Controllers\Web\Front\Locale\LocaleController;
 use App\Http\Controllers\Web\Front\Page\CmsController;
 use App\Http\Controllers\Web\Front\Page\ContactController;
 use App\Http\Controllers\Web\Front\Page\PricingController;
-use App\Http\Controllers\Web\Front\Post\CreateOrEdit\MultiSteps\Create\FinishController as CreateFinishController;
+use App\Http\Controllers\Web\Front\Post\CreateOrEdit\MultiSteps\Create\FinishController;
 use App\Http\Controllers\Web\Front\Post\CreateOrEdit\MultiSteps\Create\PaymentController as CreatePaymentController;
 use App\Http\Controllers\Web\Front\Post\CreateOrEdit\MultiSteps\Create\PhotoController as CreatePhotoController;
 use App\Http\Controllers\Web\Front\Post\CreateOrEdit\MultiSteps\Create\PostController as CreatePostController;
@@ -156,8 +156,8 @@ Route::namespace('Post')
 						Route::get('posts/create/payment/cancel', 'paymentCancel');
 					});
 				
-				Route::post('posts/create/finish', CreateFinishController::class);
-				Route::get('posts/create/finish', CreateFinishController::class);
+                                Route::post('posts/create/finish', FinishController::class);
+                                Route::get('posts/create/finish', FinishController::class);
 			});
 		
 		Route::middleware(['auth'])
