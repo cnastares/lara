@@ -76,7 +76,7 @@
 													];
 												})->toArray();
 												
-												$uploadUrl = url('posts/create/photos');
+                                                                               $uploadUrl = url('posts/create/photos/upload');
 												$uploadUrl = urlQuery($uploadUrl)->setParameters(request()->only(['packageId']))->toString();
 												$deleteUrlPattern = url('posts/create/photos/{id}/delete');
 												$reorderUrl = url('posts/create/photos/reorder');

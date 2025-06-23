@@ -22,6 +22,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Throwable;
 
 class PhotoController extends BaseController
@@ -320,10 +322,10 @@ class PhotoController extends BaseController
 	 * @param \Illuminate\Http\Request $request
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public function reorderPictures(Request $request): JsonResponse
-	{
-		$httpStatus = 200;
-		$result = ['status' => 0, 'message' => null];
+        public function reorderPictures(Request $request): JsonResponse
+        {
+                $httpStatus = 200;
+                $result = ['status' => 0, 'message' => null];
 		
 		$params = $request->input('params');
 		$stack = $params['stack'] ?? [];
@@ -353,6 +355,105 @@ class PhotoController extends BaseController
 			}
 		}
 		
-		return ajaxResponse()->json($result, $httpStatus);
-	}
+                return ajaxResponse()->json($result, $httpStatus);
+        }
+
+        /**
+         * Upload pictures asynchronously
+         *
+         * @param \Illuminate\Http\Request $request
+         * @return \Illuminate\Http\JsonResponse
+         */
+        public function uploadPhotos(Request $request): JsonResponse
+        {
+                \Log::debug('PHP Upload Configuration', [
+                        'upload_max_filesize' => ini_get('upload_max_filesize'),
+                        'post_max_size'       => ini_get('post_max_size'),
+                        'max_file_uploads'    => ini_get('max_file_uploads'),
+                        'upload_tmp_dir'      => ini_get('upload_tmp_dir'),
+                        'memory_limit'        => ini_get('memory_limit'),
+                ]);
+
+                \Log::debug('Upload request received', [
+                        'files_count'  => count($request->allFiles()),
+                        'has_pictures' => $request->hasFile('pictures'),
+                        'request_data' => $request->except(['_token', 'pictures'])
+                ]);
+
+                if (!$request->hasFile('pictures')) {
+                        \Log::warning('No pictures in upload request');
+
+                        return response()->json(['error' => 'No se encontraron archivos para subir.'], 422);
+                }
+
+                $uploadedFiles = [];
+
+                foreach ($request->file('pictures') as $index => $file) {
+                        \Log::debug('Processing file', [
+                                'index'         => $index,
+                                'original_name' => $file->getClientOriginalName(),
+                                'temp_path'     => $file->getPathname(),
+                                'size'          => $file->getSize(),
+                                'is_valid'      => $file->isValid(),
+                                'error'         => $file->getError(),
+                        ]);
+
+                        if (!$file->isValid()) {
+                                \Log::error('Invalid file detected', [
+                                        'file'         => $file->getClientOriginalName(),
+                                        'error_code'   => $file->getError(),
+                                        'error_message'=> $file->getErrorMessage(),
+                                ]);
+
+                                return response()->json(['error' => 'Archivo inválido: ' . $file->getErrorMessage()], 422);
+                        }
+
+                        try {
+                                $tempPath = $file->getPathname();
+
+                                if (!is_file($tempPath) || !is_readable($tempPath)) {
+                                        \Log::warning('Temporary file missing or unreadable', [
+                                                'file'     => $file->getClientOriginalName(),
+                                                'path'     => $tempPath,
+                                                'exists'   => file_exists($tempPath),
+                                                'readable' => is_readable($tempPath),
+                                                'size'     => $file->getSize(),
+                                        ]);
+
+                                        return response()->json(['error' => 'El archivo temporal no se encuentra disponible.'], 422);
+                                }
+
+                                $fileName = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+                                $tempStoragePath = 'temp/' . $fileName;
+
+                                Storage::putFileAs('temp', $file, $fileName);
+
+                                $uploadedFiles[] = [
+                                        'original_name' => $file->getClientOriginalName(),
+                                        'temp_name'     => $fileName,
+                                        'temp_path'     => $tempStoragePath,
+                                        'size'          => $file->getSize(),
+                                        'mime_type'     => $file->getMimeType(),
+                                ];
+
+                                \Log::info('File successfully processed', [
+                                        'original'  => $file->getClientOriginalName(),
+                                        'temp_name' => $fileName,
+                                        'size'      => $file->getSize(),
+                                ]);
+                        } catch (\Exception $e) {
+                                \Log::error('Error processing file', [
+                                        'file'  => $file->getClientOriginalName(),
+                                        'error' => $e->getMessage(),
+                                ]);
+
+                                return response()->json(['error' => 'Error al procesar el archivo: ' . $e->getMessage()], 422);
+                        }
+                }
+
+                return response()->json([
+                        'message' => 'Archivos subidos correctamente',
+                        'files'   => $uploadedFiles,
+                ], 200);
+        }
 }
