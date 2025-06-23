@@ -18,6 +18,7 @@ namespace App\Helpers\Common\Files;
 
 use App\Helpers\Common\Files\Storage\StorageDisk;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Intervention\Image\Laravel\Facades\Image;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Throwable;
@@ -111,9 +112,14 @@ class TmpUpload
 			
 			// Return the path (to the database later)
 			return $filePath;
-		} catch (Throwable $e) {
-			abort(500, $e->getMessage());
-		}
+                } catch (Throwable $e) {
+                        Log::error('Image upload error', [
+                                'message' => $e->getMessage(),
+                                'file'    => $file->getClientOriginalName() ?? null,
+                        ]);
+
+                        return null;
+                }
 	}
 	
 	/**

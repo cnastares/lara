@@ -21,6 +21,7 @@ use App\Http\Requests\Front\PhotoRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class PhotoController extends BaseController
@@ -115,12 +116,23 @@ class PhotoController extends BaseController
 		// Save uploaded files
 		$files = $request->file('pictures');
 		if (is_array($files) && count($files) > 0) {
-			foreach ($files as $key => $file) {
-				if (empty($file)) {
-					continue;
-				}
-				
-				$picturesInput[] = TmpUpload::image($file, $this->tmpUploadDir);
+                        foreach ($files as $key => $file) {
+                                if (empty($file)) {
+                                        continue;
+                                }
+
+                                $originalName = $file->getClientOriginalName();
+                                Log::debug('Processing upload', ['name' => $originalName]);
+
+                                $filePath = TmpUpload::image($file, $this->tmpUploadDir);
+
+                                if ($filePath === null) {
+                                        Log::error('Image upload failed', ['name' => $originalName]);
+                                } else {
+                                        Log::info('Image uploaded', ['path' => $filePath]);
+                                }
+
+                                $picturesInput[] = $filePath;
 				
 				// Check the picture number limit
 				if ($key >= ($picturesLimit - 1)) {
