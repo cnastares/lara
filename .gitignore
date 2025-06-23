@@ -1,68 +1,10 @@
-.env
-public/webcron.php
-# Laravel Specific
-/vendor
-/public/storage
-/storage/*.key
-/storage/oauth-private.key
-/storage/oauth-public.key
-/storage/framework
-storage/debugbar
-/bootstrap/cache
-/.env
-/.env.*.local
-.env.backup
-Homestead.yaml
-Homestead.json
-vagrantfile
-/public/css/custom_color_*.css
-/public/document
-/lang
-/Modules/Template/*
-!/Modules/Template/index.html
-
-# Vue Specific
 /node_modules
-/dist
-/.nuxt
-/.output
-/.vite
-/vite.config.ts
-/vite.config.js
-/yarn.lock
-/package-lock.json
-/public/build
-
-# OS Specific
-.DS_Store
-**/.DS_Store
-Thumbs.db
-
-# IDE/Editor Specific
-.idea
-.vscode
-/.idea
-/.vscode
-*.sublime-project
-*.sublime-workspace
-
-# Composer & NPM
-composer.lock
-yarn.lock
-pnpm-lock.yaml
-package-lock.json
-
-
-# PHPUnit
-/phpunit.xml
-/phpunit.xml.dist
-/.phpunit.result.cache
-
-# Build Artifacts
 /public/hot
-/public/mix-manifest.json
-/public/js/*.map
-/public/css/*.map
-
-# Laravel Sail (Docker)
-docker-compose.override.yml
+/storage/*.key
+/storage/app/public
+/vendor
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log

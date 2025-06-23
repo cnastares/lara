@@ -1,0 +1,15 @@
+{
+    "/assets/resources/css/app.rtl.css": "/assets/resources/css/app.rtl.css?id=eda427884173864a26b1569f3e51e384",
+    "/assets/resources/css/app.css": "/assets/resources/css/app.css?id=576a3f456c352075a5728b967a036522",
+    "/assets/resources/css/admin.css": "/assets/resources/css/admin.css?id=c7797268c16463a5c17f40713c03f552",
+    "/assets/resources/css/auth.rtl.css": "/assets/resources/css/auth.rtl.css?id=f4b1a26832c6e0f0cf4441f3d28e6004",
+    "/assets/resources/css/auth.css": "/assets/resources/css/auth.css?id=664e0b4c34a967a726b89db83f80483a",
+    "/dist/auth/styles.css": "/dist/auth/styles.css?id=664e0b4c34a967a726b89db83f80483a",
+    "/dist/auth/styles.rtl.css": "/dist/auth/styles.rtl.css?id=f4b1a26832c6e0f0cf4441f3d28e6004",
+    "/dist/auth/scripts.js": "/dist/auth/scripts.js?id=1793168182eb37a9b01f70d8cdca5723",
+    "/dist/front/styles.css": "/dist/front/styles.css?id=576a3f456c352075a5728b967a036522",
+    "/dist/front/styles.rtl.css": "/dist/front/styles.rtl.css?id=eda427884173864a26b1569f3e51e384",
+    "/dist/front/scripts.js": "/dist/front/scripts.js?id=9a47bf47ad37e8fe563f94a0d168357b",
+    "/dist/admin/styles.css": "/dist/admin/styles.css?id=c7797268c16463a5c17f40713c03f552",
+    "/dist/admin/scripts.js": "/dist/admin/scripts.js?id=2f96a677a53c4555e1249e9300e72c0f"
+}
