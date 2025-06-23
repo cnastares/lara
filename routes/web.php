@@ -27,14 +27,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::namespace('Setup')->group(__DIR__ . '/web/setup.php');
+Route::namespace('Web\\Setup')->group(__DIR__ . '/web/setup.php');
 
 Route::middleware(['installed'])
 	->group(function () {
 		$authBasePath = urlGen()->getAuthBasePath();
 		$adminBasePath = urlGen()->getAdminBasePath();
 		
-		Route::namespace('Auth')->prefix($authBasePath)->group(__DIR__ . '/web/auth.php');
-		Route::namespace('Admin')->prefix($adminBasePath)->group(__DIR__ . '/web/admin.php');
-		Route::namespace('Front')->group(__DIR__ . '/web/front.php');
+                Route::namespace('Web\\Auth')->prefix($authBasePath)->group(__DIR__ . '/web/auth.php');
+                Route::namespace('Web\\Admin')->prefix($adminBasePath)->group(__DIR__ . '/web/admin.php');
+                Route::namespace('Web\\Front')->group(__DIR__ . '/web/front.php');
 	});
