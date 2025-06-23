@@ -40,13 +40,15 @@ class TmpUpload
         }
 
         $path = $file->getRealPath();
-        if (empty($path) || !is_file($path)) {
+        if (empty($path) || !file_exists($path)) {
                 Log::warning('Temporary file missing', [
-                        'file' => $file->getClientOriginalName(),
-                        'path' => $path,
+                        'file'       => $file->getClientOriginalName(),
+                        'path'       => (string)$path,
+                        'livewire'   => request()->header('X-Livewire') ? true : false,
+                        'files_count'=> is_countable(request()->file('pictures')) ? count(request()->file('pictures')) : 0,
                 ]);
 
-                return response()->json(['error' => 'Imagen no válida.'], 422);
+                return response()->json(['error' => 'El archivo temporal no se encuentra disponible.'], 422);
         }
 
         $disk = StorageDisk::getDisk();
