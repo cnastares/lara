@@ -58,9 +58,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 // auth
-Route::namespace('Auth')
-	->prefix('auth')
-	->group(function ($router) {
+Route::prefix('auth')
+        ->group(function ($router) {
 		
 		$router->pattern('userId', '[0-9]+');
 		
