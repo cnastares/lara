@@ -17,8 +17,10 @@
 namespace App\Helpers\Common\Files;
 
 use App\Helpers\Common\Files\Storage\StorageDisk;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Intervention\Image\Exception\NotReadableException;
 use Intervention\Image\Laravel\Facades\Image;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Throwable;
@@ -28,16 +30,26 @@ class TmpUpload
 	/**
 	 * @param $file
 	 * @param string $tmpUploadDir
-	 * @param string|null $filename
-	 * @return string|null
-	 */
-	public static function image($file, string $tmpUploadDir, ?string $filename = null): ?string
+     * @param string|null $filename
+     * @return string|JsonResponse|null
+     */
+    public static function image($file, string $tmpUploadDir, ?string $filename = null): string|JsonResponse|null
 	{
-		if (!$file instanceof SymfonyUploadedFile) {
-			return null;
-		}
-		
-		$disk = StorageDisk::getDisk();
+        if (!$file instanceof SymfonyUploadedFile) {
+                return null;
+        }
+
+        $path = $file->getRealPath();
+        if (empty($path) || !is_file($path)) {
+                Log::warning('Temporary file missing', [
+                        'file' => $file->getClientOriginalName(),
+                        'path' => $path,
+                ]);
+
+                return response()->json(['error' => 'Imagen no válida.'], 422);
+        }
+
+        $disk = StorageDisk::getDisk();
 		
 		try {
 			// Get file's original infos
@@ -112,14 +124,24 @@ class TmpUpload
 			
 			// Return the path (to the database later)
 			return $filePath;
-                } catch (Throwable $e) {
-                        Log::error('Image upload error', [
-                                'message' => $e->getMessage(),
-                                'file'    => $file->getClientOriginalName() ?? null,
-                        ]);
-
-                        return null;
+        } catch (NotReadableException|ValueError|Throwable $e) {
+                $inputExcerpt = null;
+                try {
+                        $contents = File::get($path);
+                        if (is_string($contents) && str_starts_with($contents, 'data:')) {
+                                $inputExcerpt = substr($contents, 0, 100);
+                        }
+                } catch (Throwable $e2) {
                 }
+
+                Log::error('Image upload error', [
+                        'message'        => $e->getMessage(),
+                        'file'           => $file->getClientOriginalName() ?? null,
+                        'input_excerpt'  => $inputExcerpt,
+                ]);
+
+                return response()->json(['error' => 'Imagen no válida.'], 422);
+        }
 	}
 	
 	/**
