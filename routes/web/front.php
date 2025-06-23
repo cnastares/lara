@@ -139,10 +139,11 @@ Route::namespace('Post')
 				Route::controller(CreatePhotoController::class)
 					->group(function ($router) {
 						Route::get('posts/create/photos', 'showForm');
-						Route::post('posts/create/photos', 'postForm');
-						Route::post('posts/create/photos/{photoId}/delete', 'removePicture');
-						Route::post('posts/create/photos/reorder', 'reorderPictures');
-					});
+                                                Route::post('posts/create/photos', 'postForm');
+                                                Route::post('posts/create/photos/upload', 'uploadPhotos');
+                                                Route::post('posts/create/photos/{photoId}/delete', 'removePicture');
+                                                Route::post('posts/create/photos/reorder', 'reorderPictures');
+                                        });
 				
 				Route::controller(CreatePaymentController::class)
 					->group(function ($router) {
@@ -188,10 +189,11 @@ Route::namespace('Post')
 						Route::controller(EditPhotoController::class)
 							->group(function ($router) {
 								Route::get('posts/{id}/photos', 'showForm');
-								Route::post('posts/{id}/photos', 'postForm');
-								Route::post('posts/{id}/photos/{photoId}/delete', 'delete');
-								Route::post('posts/{id}/photos/reorder', 'reorder');
-							});
+                                                                Route::post('posts/{id}/photos', 'postForm');
+                                                                Route::post('posts/{id}/photos/upload', 'uploadPhotos');
+                                                                Route::post('posts/{id}/photos/{photoId}/delete', 'delete');
+                                                                Route::post('posts/{id}/photos/reorder', 'reorder');
+                                                        });
 						
 						Route::controller(EditPaymentController::class)
 							->group(function ($router) {

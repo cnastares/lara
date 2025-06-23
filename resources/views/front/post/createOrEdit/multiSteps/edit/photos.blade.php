@@ -94,7 +94,7 @@
 													];
 												})->toArray();
 												
-												$uploadUrl = url('posts/' . $postId . '/photos/');
+                                                                               $uploadUrl = url('posts/' . $postId . '/photos/upload');
 												$uploadUrl = urlQuery($uploadUrl)->setParameters(request()->only(['packageId']))->toString();
 												$deleteUrlPattern = url('posts/' . $postId . '/photos/{id}/delete');
 												$reorderUrl = url('posts/' . $postId . '/photos/reorder');

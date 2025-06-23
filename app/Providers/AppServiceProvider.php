@@ -28,6 +28,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Sanctum\Sanctum;
 use Throwable;
@@ -69,8 +70,13 @@ class AppServiceProvider extends ServiceProvider
 		} catch (Throwable $e) {
 		}
 		
-		// Setup Storage Symlink
-		$this->setupStorageSymlink();
+                // Setup Storage Symlink
+                $this->setupStorageSymlink();
+
+                // Ensure temporary storage directory exists
+                if (!Storage::exists('temp')) {
+                        Storage::makeDirectory('temp');
+                }
 		
 		// Setup ACL system
 		$this->setupAclSystem();

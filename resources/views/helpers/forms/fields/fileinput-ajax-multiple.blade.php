@@ -388,7 +388,12 @@
 		fiOptions.browseOnZoneClick = true;
 		
 		fiOptions.uploadUrl = '{{ $uploadUrl }}';
-		fiOptions.uploadAsync = false;
+                fiOptions.uploadAsync = true;
+                fiOptions.ajaxSettings = {
+                        timeout: 30000,
+                        processData: false,
+                        contentType: false
+                };
 		fiOptions.uploadExtraData = {!! collect($uploadExtraData)->toJson() !!};
 		fiOptions.elErrorContainer = elErrorContainer;
 		fiOptions.msgErrorClass = '{{ $msgErrorClass }}';
@@ -526,13 +531,18 @@
 
                         {{-- Single file upload error hook --}}
                         dropzoneFieldEl.on('fileuploaderror', (event, data, msg) => {
-                                console.error('Upload error:', msg);
-                                if (data?.jqXHR?.status === 422) {
+                                console.error('Upload error details:', {
+                                        status: data.jqXHR.status,
+                                        response: data.jqXHR.responseText,
+                                        message: msg
+                                });
+
+                                if (data.jqXHR.status === 422) {
                                         try {
-                                                const response = JSON.parse(data.jqXHR.responseText);
-                                                alert('Error: ' + response.error);
-                                        } catch (e) {
-                                                console.error(e);
+                                                let response = JSON.parse(data.jqXHR.responseText);
+                                                alert('Error de validación: ' + (response.error || response.message || 'Error desconocido'));
+                                        } catch(e) {
+                                                alert('Error de validación: Respuesta del servidor no válida');
                                         }
                                 }
                         });
