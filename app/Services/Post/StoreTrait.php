@@ -22,6 +22,7 @@ use App\Models\Post;
 use App\Services\Post\Store\AutoRegistrationTrait;
 use App\Services\Post\Store\StoreFieldValueTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 trait StoreTrait
@@ -117,9 +118,13 @@ trait StoreTrait
 			
 			$post->save();
 			
-		} catch (Throwable $e) {
-			return apiResponse()->error($e->getMessage());
-		}
+                } catch (Throwable $e) {
+                        Log::error('Post creation failed', [
+                                'error' => $e->getMessage(),
+                        ]);
+
+                        return apiResponse()->error($e->getMessage());
+                }
 		
 		// Get the API response data
 		$data = [
@@ -134,9 +139,14 @@ trait StoreTrait
 		$extra['pictures'] = [];
 		try {
 			$extra['pictures'] = $this->singleStepPicturesStore($post->id, $request);
-		} catch (Throwable $e) {
-			return apiResponse()->error($e->getMessage());
-		}
+                } catch (Throwable $e) {
+                        Log::error('Post picture processing failed', [
+                                'post_id' => $post->id ?? null,
+                                'error' => $e->getMessage(),
+                        ]);
+
+                        return apiResponse()->error($e->getMessage());
+                }
 		
 		// Custom Fields
 		$this->fieldsValuesStore($post, $request);
@@ -192,8 +202,13 @@ trait StoreTrait
 		// Send Confirmation Notification, when user clicks on the Verification Link or enters the Verification Code.
 		// Done in the "app/Observers/PostObserver.php" file.
 		
-		$data['extra'] = $extra;
-		
-		return apiResponse()->json($data);
-	}
+                $data['extra'] = $extra;
+
+                Log::info('Post created', [
+                        'post_id' => $post->id,
+                        'user_id' => $post->user_id,
+                ]);
+
+                return apiResponse()->json($data);
+        }
 }

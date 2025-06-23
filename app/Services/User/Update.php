@@ -23,6 +23,7 @@ use App\Models\Scopes\VerifiedScope;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 trait Update
 {
@@ -199,8 +200,12 @@ trait Update
 			}
 		}
 		
-		$data['extra'] = $extra;
-		
-		return apiResponse()->updated($data);
-	}
+                $data['extra'] = $extra;
+
+                Log::info('User profile updated', [
+                        'user_id' => $user->id,
+                ]);
+
+                return apiResponse()->updated($data);
+        }
 }

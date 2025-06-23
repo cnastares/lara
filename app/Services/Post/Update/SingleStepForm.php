@@ -22,6 +22,7 @@ use App\Models\City;
 use App\Models\Post;
 use App\Models\Scopes\ReviewedScope;
 use App\Models\Scopes\VerifiedScope;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 trait SingleStepForm
@@ -121,12 +122,17 @@ trait SingleStepForm
 		$extra['pictures'] = [];
 		try {
 			$extra['pictures'] = $this->singleStepPicturesStore($post->id, $request);
-		} catch (Throwable $e) {
-			$data['success'] = false;
-			$data['message'] = $e->getMessage();
-			
-			return apiResponse()->json($data);
-		}
+                } catch (Throwable $e) {
+                        Log::error('Post update pictures failed', [
+                                'post_id' => $post->id,
+                                'error' => $e->getMessage(),
+                        ]);
+
+                        $data['success'] = false;
+                        $data['message'] = $e->getMessage();
+
+                        return apiResponse()->json($data);
+                }
 		
 		// Custom Fields
 		$this->fieldsValuesStore($post, $request);
@@ -176,8 +182,13 @@ trait SingleStepForm
 			}
 		}
 		
-		$data['extra'] = $extra;
-		
-		return apiResponse()->json($data);
-	}
+                $data['extra'] = $extra;
+
+                Log::info('Post updated', [
+                        'post_id' => $post->id,
+                        'user_id' => $post->user_id,
+                ]);
+
+                return apiResponse()->json($data);
+        }
 }

@@ -20,6 +20,7 @@ use App\Models\Permission;
 use App\Models\Scopes\VerifiedScope;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 trait Delete
 {
@@ -71,8 +72,12 @@ trait Delete
 		// Close User's session (by revoking all the user's tokens)
 		$user->tokens()->delete();
 		
-		// Delete User
-		$user->delete();
+                // Delete User
+                $user->delete();
+
+                Log::info('User account deleted', [
+                        'user_id' => $user->id,
+                ]);
 		
 		$message = t('your_account_has_been_deleted_1');
 		

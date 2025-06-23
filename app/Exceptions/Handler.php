@@ -44,9 +44,11 @@ use App\Exceptions\Handler\UnserializeExceptionHandler;
 use App\Exceptions\Handler\ValidationExceptionHandler;
 use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Request;
+use Throwable;
 
-class Handler
+class Handler extends ExceptionHandler
 {
 	use ExceptionTrait, HandlerTrait, NotificationTrait;
 	
@@ -74,8 +76,13 @@ class Handler
 	use UnserializeExceptionHandler;
 	use ValidationExceptionHandler;
 	
-	protected mixed $app;
-	protected ConfigRepository $config;
+        protected mixed $app;
+        protected ConfigRepository $config;
+
+        public function report(Throwable $e): void
+        {
+                parent::report($e);
+        }
 	
 	public function __construct()
 	{

@@ -25,6 +25,7 @@ use App\Services\Auth\LoginService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Log;
 use Larapen\LaravelMetaTags\Facades\MetaTag;
 
 class LoginController extends FrontController
@@ -170,9 +171,14 @@ class LoginController extends FrontController
 			}
 		}
 		
-		if ($success) {
-			return $this->createNewSession($data);
-		}
+                if ($success) {
+                        Log::info('User logged in', [
+                                'user_id' => auth()->id(),
+                                'ip' => $request->ip(),
+                        ]);
+
+                        return $this->createNewSession($data);
+                }
 		
 		$message = $message ?? trans('auth.failed');
 		
@@ -192,13 +198,18 @@ class LoginController extends FrontController
 		// Parsing the API response
 		$message = data_get($data, 'message');
 		
-		if (data_get($data, 'success')) {
-			// Log out the user on a web client (Browser)
-			logoutSession($message);
-			
-			// Reset Dark Mode
-			Cookie::forget('darkTheme');
-		} else {
+                if (data_get($data, 'success')) {
+                        Log::info('User logged out', [
+                                'user_id' => $userId,
+                                'ip' => request()->ip(),
+                        ]);
+
+                        // Log out the user on a web client (Browser)
+                        logoutSession($message);
+
+                        // Reset Dark Mode
+                        Cookie::forget('darkTheme');
+                } else {
 			$message = $message ?? t('unknown_error');
 			flash($message)->error();
 		}

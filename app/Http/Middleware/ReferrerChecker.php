@@ -18,6 +18,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ReferrerChecker
 {
@@ -96,11 +97,12 @@ class ReferrerChecker
 	 *
 	 * @param string $message
 	 */
-	private function accessForbidden(string $message = 'Unauthorized')
-	{
-		echo '<pre>';
-		print_r($message);
-		echo '</pre>';
-		exit();
-	}
+    private function accessForbidden(string $message = 'Unauthorized')
+    {
+        Log::warning('Referrer access forbidden', [
+            'ip' => request()->ip(),
+        ]);
+
+        abort(401, $message);
+    }
 }
