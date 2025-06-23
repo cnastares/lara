@@ -173,19 +173,28 @@ class PhotoController extends BaseController
                                 $originalName = $file->getClientOriginalName();
                                 Log::debug('Processing upload', ['name' => $originalName]);
 
-                                $filePath = TmpUpload::image($file, $this->tmpUploadDir);
+                $filePath = TmpUpload::image($file, $this->tmpUploadDir);
 
-                                if ($filePath instanceof JsonResponse) {
-                                        return $filePath;
-                                }
+                if ($filePath instanceof JsonResponse) {
+                        return $filePath;
+                }
 
-                                if ($filePath === null) {
-                                        Log::error('Image upload failed', ['name' => $originalName]);
-                                } else {
-                                        Log::info('Image uploaded', ['path' => $filePath]);
+                if (!is_string($filePath)) {
+                        Log::error('Image upload failed', [
+                                'name' => $originalName,
+                                'type' => gettype($filePath),
+                        ]);
 
-                                        $picturesInput[] = $filePath;
-                                }
+                        return response()->json(['error' => 'Imagen no válida.'], 422);
+                }
+
+                if ($filePath === null) {
+                        Log::error('Image upload failed', ['name' => $originalName]);
+                } else {
+                        Log::info('Image uploaded', ['path' => $filePath]);
+
+                        $picturesInput[] = $filePath;
+                }
 				
 				// Check the picture number limit
 				if ($key >= ($picturesLimit - 1)) {
@@ -438,6 +447,15 @@ class PhotoController extends BaseController
 
                         if ($filePath instanceof JsonResponse) {
                                 return $filePath;
+                        }
+
+                        if (!is_string($filePath)) {
+                                \Log::error('Image upload failed', [
+                                        'name' => $file->getClientOriginalName(),
+                                        'type' => gettype($filePath),
+                                ]);
+
+                                return response()->json(['error' => 'Imagen no válida.'], 422);
                         }
 
                         if ($filePath === null) {
