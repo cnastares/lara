@@ -74,8 +74,10 @@ class AppServiceProvider extends ServiceProvider
                 $this->setupStorageSymlink();
 
                 // Ensure temporary storage directory exists
-                if (!Storage::exists('temp')) {
-                        Storage::makeDirectory('temp');
+                $tempPath = storage_path('app/temp');
+                if (!is_dir($tempPath)) {
+                        mkdir($tempPath, 0755, true);
+                        \Log::info('Created temp directory', ['path' => $tempPath]);
                 }
 		
 		// Setup ACL system
