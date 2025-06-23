@@ -23,6 +23,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\Helpers\Common\Files\Storage\StorageDisk;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -358,12 +359,6 @@ class PhotoController extends BaseController
                 return ajaxResponse()->json($result, $httpStatus);
         }
 
-        /**
-         * Upload pictures asynchronously
-         *
-         * @param \Illuminate\Http\Request $request
-         * @return \Illuminate\Http\JsonResponse
-         */
         public function uploadPhotos(Request $request): JsonResponse
         {
                 \Log::debug('PHP Upload Configuration', [
@@ -404,7 +399,20 @@ class PhotoController extends BaseController
                         return response()->json(['error' => 'No se encontraron archivos para subir.'], 422);
                 }
 
+                if (!session()->has('uid')) {
+                        session()->put('uid', generateUniqueCode(9));
+                }
+                if (session()->has('uid')) {
+                        $this->tmpUploadDir = $this->tmpUploadDir . '/' . session('uid');
+                }
+
+                $savedPicturesInput = (array)session('picturesInput');
+                $picturesInput = [];
                 $uploadedFiles = [];
+
+                $defaultPicturesLimit = (int)config('settings.listing_form.pictures_limit', 5);
+                $countExistingPictures = count($savedPicturesInput);
+                $picturesLimit = $defaultPicturesLimit - $countExistingPictures;
 
                 foreach ($request->file('pictures') as $index => $file) {
                         \Log::debug('Processing file', [
@@ -426,91 +434,34 @@ class PhotoController extends BaseController
                                 return response()->json(['error' => 'Archivo inválido: ' . $file->getErrorMessage()], 422);
                         }
 
-                        try {
-                                $tempPath = $file->getPathname();
+                        $filePath = TmpUpload::image($file, $this->tmpUploadDir);
 
-                                // VALIDACIÓN CRÍTICA: Verificar que el path no esté vacío
-                                if (empty($tempPath) || !is_string($tempPath)) {
-                                        \Log::error('Empty or invalid temp path', [
-                                                'file'       => $file->getClientOriginalName(),
-                                                'path'       => $tempPath,
-                                                'path_type'  => gettype($tempPath),
-                                                'temp_name'  => $file->getFilename(),
-                                                'size'       => $file->getSize(),
-                                        ]);
+                        if ($filePath instanceof JsonResponse) {
+                                return $filePath;
+                        }
 
-                                        $tempPath = $file->getRealPath();
-                                        if (empty($tempPath)) {
-                                                return response()->json(['error' => 'No se puede acceder al archivo temporal: ' . $file->getClientOriginalName()], 422);
-                                        }
-                                }
+                        if ($filePath === null) {
+                                \Log::error('Image upload failed', ['name' => $file->getClientOriginalName()]);
+                        } else {
+                                \Log::info('Image uploaded', ['path' => $filePath]);
 
-                                if (!is_file($tempPath) || !is_readable($tempPath)) {
-                                        \Log::warning('Temporary file missing or unreadable', [
-                                                'file'     => $file->getClientOriginalName(),
-                                                'path'     => $tempPath,
-                                                'exists'   => file_exists($tempPath),
-                                                'readable' => is_readable($tempPath),
-                                                'size'     => $file->getSize(),
-                                        ]);
-
-                                        return response()->json(['error' => 'El archivo temporal no se encuentra disponible: ' . $file->getClientOriginalName()], 422);
-                                }
-
-                                // PROCESAR ARCHIVO MANUALMENTE sin usar Storage::putFileAs()
-                                $fileName = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-                                $tempStoragePath = storage_path('app/temp/' . $fileName);
-
-                                $tempDir = dirname($tempStoragePath);
-                                if (!is_dir($tempDir)) {
-                                        mkdir($tempDir, 0755, true);
-                                }
-
-                                if (!copy($tempPath, $tempStoragePath)) {
-                                        \Log::error('Failed to copy temporary file', [
-                                                'source'        => $tempPath,
-                                                'destination'   => $tempStoragePath,
-                                                'source_exists' => file_exists($tempPath),
-                                                'dest_writable' => is_writable($tempDir),
-                                        ]);
-                                        return response()->json(['error' => 'Error al procesar el archivo: ' . $file->getClientOriginalName()], 422);
-                                }
-
-                                if (!file_exists($tempStoragePath)) {
-                                        \Log::error('File copy verification failed', [
-                                                'destination' => $tempStoragePath,
-                                                'source_size' => filesize($tempPath),
-                                                'file'        => $file->getClientOriginalName(),
-                                        ]);
-                                        return response()->json(['error' => 'Error en la verificación del archivo copiado'], 422);
-                                }
-
+                                $picturesInput[] = $filePath;
                                 $uploadedFiles[] = [
                                         'original_name' => $file->getClientOriginalName(),
-                                        'temp_name'     => $fileName,
-                                        'temp_path'     => 'temp/' . $fileName,
-                                        'full_path'     => $tempStoragePath,
+                                        'temp_name'     => basename($filePath),
+                                        'temp_path'     => $filePath,
                                         'size'          => $file->getSize(),
                                         'mime_type'     => $file->getMimeType(),
                                 ];
+                        }
 
-                                \Log::info('File successfully processed manually', [
-                                        'original'     => $file->getClientOriginalName(),
-                                        'temp_name'    => $fileName,
-                                        'size'         => filesize($tempStoragePath),
-                                        'source_path'  => $tempPath,
-                                        'destination'  => $tempStoragePath,
-                                ]);
-
-                        } catch (\Exception $e) {
-                                \Log::error('Error processing file', [
-                                        'file'  => $file->getClientOriginalName(),
-                                        'error' => $e->getMessage(),
-                                ]);
-
-                                return response()->json(['error' => 'Error al procesar el archivo: ' . $e->getMessage()], 422);
+                        if ($index >= ($picturesLimit - 1)) {
+                                break;
                         }
                 }
+
+                $newPicturesInput = array_merge($savedPicturesInput, $picturesInput);
+                session()->put('picturesInput', $newPicturesInput);
 
                 $this->cleanupOldTempFiles();
 
@@ -518,11 +469,11 @@ class PhotoController extends BaseController
                         'message' => 'Archivos subidos correctamente',
                         'files'   => $uploadedFiles,
                 ], 200);
-        }
-
         private function cleanupOldTempFiles()
         {
-                $tempDir = storage_path('app/temp');
+                $disk = StorageDisk::getDisk();
+                $tempDir = $disk->path('temporary');
+
                 if (!is_dir($tempDir)) {
                         return;
                 }
