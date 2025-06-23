@@ -126,13 +126,17 @@ class PhotoController extends BaseController
 
                                 $filePath = TmpUpload::image($file, $this->tmpUploadDir);
 
+                                if ($filePath instanceof JsonResponse) {
+                                        return $filePath;
+                                }
+
                                 if ($filePath === null) {
                                         Log::error('Image upload failed', ['name' => $originalName]);
                                 } else {
                                         Log::info('Image uploaded', ['path' => $filePath]);
-                                }
 
-                                $picturesInput[] = $filePath;
+                                        $picturesInput[] = $filePath;
+                                }
 				
 				// Check the picture number limit
 				if ($key >= ($picturesLimit - 1)) {
