@@ -226,38 +226,33 @@ Route::namespace('Post')
 
 
 // BROWSING
-Route::namespace('Browsing')
-	->prefix('browsing')
-	->group(function ($router) {
-		// Categories
-		Route::controller(BrowsingCategoryController::class)
-			->group(function ($router) {
-				$router->pattern('id', '[0-9]+');
-				Route::post('categories/select', 'getCategoriesHtml'); // To remove!
+Route::prefix('browsing')
+        ->group(function ($router) {
+                // Categories
+                Route::controller(BrowsingCategoryController::class)
+                        ->group(function ($router) {
+                                $router->pattern('id', '[0-9]+');
+                                Route::post('categories/select', 'getCategoriesHtml'); // To remove!
 				Route::get('categories/select', 'getCategoriesHtml');
 				Route::post('categories/{id}/fields', 'getCustomFieldsHtml');
 			});
-		
-		// Location
-		Route::namespace('Location')
-			->group(function ($router) {
-				$router->pattern('countryCode', getCountryCodeRoutePattern());
-				Route::post('countries/{countryCode}/cities/autocomplete', AutoCompleteController::class);
-				Route::controller(SelectBoxController::class)
-					->group(function ($router) {
-						$router->pattern('id', '[0-9]+');
-						Route::get('countries/{countryCode}/admins/{adminType}', 'getAdmins');
-						Route::get('countries/{countryCode}/admins/{adminType}/{adminCode}/cities', 'getCities');
-						Route::get('countries/{countryCode}/cities/{id}', 'getSelectedCity');
-					});
-				Route::controller(ModalController::class)
-					->group(function ($router) {
-						Route::post('locations/{countryCode}/admins/{adminType}', 'getAdmins');
-						Route::post('locations/{countryCode}/admins/{adminType}/{adminCode}/cities', 'getCities');
-						Route::post('locations/{countryCode}/cities', 'getCities');
-					});
-			});
-	});
+                // Location
+                $router->pattern('countryCode', getCountryCodeRoutePattern());
+                Route::post('countries/{countryCode}/cities/autocomplete', AutoCompleteController::class);
+                Route::controller(SelectBoxController::class)
+                        ->group(function ($router) {
+                                $router->pattern('id', '[0-9]+');
+                                Route::get('countries/{countryCode}/admins/{adminType}', 'getAdmins');
+                                Route::get('countries/{countryCode}/admins/{adminType}/{adminCode}/cities', 'getCities');
+                                Route::get('countries/{countryCode}/cities/{id}', 'getSelectedCity');
+                        });
+                Route::controller(ModalController::class)
+                        ->group(function ($router) {
+                                Route::post('locations/{countryCode}/admins/{adminType}', 'getAdmins');
+                                Route::post('locations/{countryCode}/admins/{adminType}/{adminCode}/cities', 'getCities');
+                                Route::post('locations/{countryCode}/cities', 'getCities');
+                        });
+        });
 
 
 // FEEDS
