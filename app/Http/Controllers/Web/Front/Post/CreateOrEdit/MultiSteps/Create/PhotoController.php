@@ -111,10 +111,49 @@ class PhotoController extends BaseController
 			$this->tmpUploadDir = $this->tmpUploadDir . '/' . session('uid');
 		}
 		
-		$picturesInput = [];
-		
+                $picturesInput = [];
+
                 // Save uploaded files
                 $files = $request->file('pictures');
+
+                if (isFromAjax($request)) {
+                        Log::debug('Upload request received', [
+                                'files_count'  => count($request->allFiles()),
+                                'has_pictures' => $request->hasFile('pictures'),
+                                'request_data' => $request->except(['_token'])
+                        ]);
+
+                        if (!$request->hasFile('pictures')) {
+                                Log::warning('No files in upload request', ['request' => $request->all()]);
+
+                                return response()->json(['error' => 'No se encontraron archivos para subir.'], 422);
+                        }
+
+                        foreach ((array)$files as $index => $file) {
+                                if (!$file || !$file->isValid()) {
+                                        Log::warning('Invalid file in upload', [
+                                                'index'       => $index,
+                                                'file_exists' => $file ? 'yes' : 'no',
+                                                'is_valid'    => $file ? $file->isValid() : false,
+                                                'error'       => $file ? $file->getErrorMessage() : 'File is null',
+                                        ]);
+
+                                        return response()->json(['error' => 'Archivo temporal no válido o expirado.'], 422);
+                                }
+
+                                $tempPath = $file->getRealPath();
+                                if (!file_exists($tempPath)) {
+                                        Log::warning('Temporary file missing', [
+                                                'file' => $file->getClientOriginalName(),
+                                                'path' => $tempPath,
+                                                'size' => $file->getSize(),
+                                        ]);
+
+                                        return response()->json(['error' => 'El archivo temporal no se encuentra disponible.'], 422);
+                                }
+                        }
+                }
+
                 if (!is_array($files) || count($files) === 0) {
                         Log::warning('postForm called without files', [
                                 'from_ajax' => isFromAjax($request),

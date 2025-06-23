@@ -519,10 +519,23 @@
 				}
 			});
 			
-			{{-- After error occured during file batch upload hook --}}
-			dropzoneFieldEl.on('filebatchuploaderror', (event, data, errorMessage) => {
-				showErrorMessage(errorMessage, elSuccessContainer, elErrorContainer);
-			});
+                        {{-- After error occured during file batch upload hook --}}
+                        dropzoneFieldEl.on('filebatchuploaderror', (event, data, errorMessage) => {
+                                showErrorMessage(errorMessage, elSuccessContainer, elErrorContainer);
+                        });
+
+                        {{-- Single file upload error hook --}}
+                        dropzoneFieldEl.on('fileuploaderror', (event, data, msg) => {
+                                console.error('Upload error:', msg);
+                                if (data?.jqXHR?.status === 422) {
+                                        try {
+                                                const response = JSON.parse(data.jqXHR.responseText);
+                                                alert('Error: ' + response.error);
+                                        } catch (e) {
+                                                console.error(e);
+                                        }
+                                }
+                        });
 			
 			{{-- Before deletion hook --}}
 			dropzoneFieldEl.on('filepredelete', (event, key, jqXHR, data) => {
