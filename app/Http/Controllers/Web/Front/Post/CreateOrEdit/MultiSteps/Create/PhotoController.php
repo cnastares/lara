@@ -113,9 +113,16 @@ class PhotoController extends BaseController
 		
 		$picturesInput = [];
 		
-		// Save uploaded files
-		$files = $request->file('pictures');
-		if (is_array($files) && count($files) > 0) {
+                // Save uploaded files
+                $files = $request->file('pictures');
+                if (!is_array($files) || count($files) === 0) {
+                        Log::warning('postForm called without files', [
+                                'from_ajax' => isFromAjax($request),
+                                'count'     => is_countable($files) ? count($files) : 0,
+                        ]);
+                }
+
+                if (is_array($files) && count($files) > 0) {
                         foreach ($files as $key => $file) {
                                 if (empty($file)) {
                                         continue;
