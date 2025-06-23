@@ -156,8 +156,8 @@ Route::namespace('Post')
 						Route::get('posts/create/payment/cancel', 'paymentCancel');
 					});
 				
-                                Route::post('posts/create/finish', FinishController::class);
-                                Route::get('posts/create/finish', FinishController::class);
+                                Route::post('posts/create/finish', [FinishController::class, 'finish']);
+                                Route::get('posts/create/finish', [FinishController::class, 'finish']);
 			});
 		
 		Route::middleware(['auth'])
