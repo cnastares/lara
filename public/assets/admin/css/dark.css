@@ -1,0 +1,21 @@
+/*
+=================================================
+  Dark Theme Styles
+=================================================
+*/
+
+/* select2-bootstrap3-theme */
+body[data-theme="dark"] .select2-container--bootstrap .select2-selection {
+	background-color: var(--input-bg);
+	color: var(--text-color-meta);
+}
+body[data-theme="dark"] .select2-container--bootstrap .select2-selection--single .select2-selection__rendered {
+	color: var(--text-color-meta);
+}
+
+/* breadcrumb and settings titles */
+[data-theme="dark"] p.setting-group-breadcrumb,
+[data-theme="dark"] h2.setting-group-name,
+[data-theme="dark"] .settings-edition h3 {
+	border-bottom: 1px solid #323743;
+}

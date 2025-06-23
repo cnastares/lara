@@ -1,0 +1,1108 @@
+name: Listings
+description: ''
+endpoints:
+  -
+    httpMethods:
+      - GET
+    uri: api/postTypes
+    metadata:
+      groupName: Listings
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List listing types'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+      Content-Language: en
+      X-AppApiToken: Uk1DSFlVUVhIRXpHbWt6d2pIZjlPTG15akRPN2tJTUs=
+      X-AppType: docs
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":null,"result":{"1":{"id":1,"name":"INDIVIDUAL","label":"Individual"},"2":{"id":2,"name":"PROFESSIONAL","label":"Professional"}}}'
+        headers:
+          content-type: 'application/json; charset=UTF-8'
+          cache-control: 'no-cache, private'
+          vary: Origin
+        description: null
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: 'api/postTypes/{id}'
+    metadata:
+      groupName: Listings
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get listing type'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+      Content-Language: en
+      X-AppApiToken: Uk1DSFlVUVhIRXpHbWt6d2pIZjlPTG15akRPN2tJTUs=
+      X-AppType: docs
+    urlParameters:
+      id:
+        name: id
+        description: "The listing type's ID."
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":null,"result":{"id":1,"name":"INDIVIDUAL","label":"Individual"}}'
+        headers:
+          content-type: 'application/json; charset=UTF-8'
+          cache-control: 'no-cache, private'
+          vary: Origin
+        description: null
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/reportTypes
+    metadata:
+      groupName: Listings
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List report types'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+      Content-Language: en
+      X-AppApiToken: Uk1DSFlVUVhIRXpHbWt6d2pIZjlPTG15akRPN2tJTUs=
+      X-AppType: docs
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":null,"result":{"data":[{"id":5,"name":"Other"},{"id":4,"name":"Wrong category"},{"id":3,"name":"Spam"},{"id":2,"name":"Duplicate"},{"id":1,"name":"Fraud"}]}}'
+        headers:
+          content-type: 'application/json; charset=UTF-8'
+          cache-control: 'no-cache, private'
+          vary: Origin
+        description: null
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: 'api/reportTypes/{id}'
+    metadata:
+      groupName: Listings
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get report type'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+      Content-Language: en
+      X-AppApiToken: Uk1DSFlVUVhIRXpHbWt6d2pIZjlPTG15akRPN2tJTUs=
+      X-AppType: docs
+    urlParameters:
+      id:
+        name: id
+        description: "The report type's ID."
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":null,"result":{"id":1,"name":"Fraud"}}'
+        headers:
+          content-type: 'application/json; charset=UTF-8'
+          cache-control: 'no-cache, private'
+          vary: Origin
+        description: null
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/posts
+    metadata:
+      groupName: Listings
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List listings'
+      description: |-
+        Note: The main picture of the listings is fetched via a 'picture' attribute (added as fake column),
+        that provide default picture as image placeholder when the listing has no pictures.
+        In addition, for performance reasons, default picture is also provided when the 'pictures' table is not embed in the endpoint.
+        So you need to embed the picture table like: /api/posts?embed=pictures to retrieve right main picture data.
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+      Content-Language: en
+      X-AppApiToken: Uk1DSFlVUVhIRXpHbWt6d2pIZjlPTG15akRPN2tJTUs=
+      X-AppType: docs
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      op:
+        name: op
+        description: 'Type of listings list (optional) - Possible value: search,premium,latest,free,premiumFirst,similar.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      postId:
+        name: postId
+        description: "Base Listing's ID to get similar listings (optional) - Mandatory to get similar listings (when op=similar)."
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      distance:
+        name: distance
+        description: "Distance to get similar listings (optional) - Also optional when the type of similar listings is based on the current listing's category. Mandatory when the type of similar listings is based on the current listing's location. So, its usage is limited to get similar listings (when op=similar) based on the current listing's location."
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      belongLoggedUser:
+        name: belongLoggedUser
+        description: 'Force users to be logged to get data that belongs to him. Authentication token needs to be sent in the header, and the "op" parameter needs to be null or unset - Possible value: 0 or 1.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      pendingApproval:
+        name: pendingApproval
+        description: 'To list a user''s listings in pending approval. Authentication token needs to be sent in the header, and the "op" parameter needs to be null or unset - Possible value: 0 or 1.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      archived:
+        name: archived
+        description: 'To list a user''s archived listings. Authentication token needs to be sent in the header, and the "op" parameter need be null or unset - Possible value: 0 or 1.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      embed:
+        name: embed
+        description: 'Comma-separated list of the post relationships for Eager Loading - Possible values: user,category,parent,postType,city,currency,savedByLoggedUser,pictures,payment,package.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      sort:
+        name: sort
+        description: 'The sorting parameter (Order by DESC with the given column. Use "-" as prefix to order by ASC). Possible values: created_at.'
+        required: false
+        example: created_at
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      perPage:
+        name: perPage
+        description: 'Items per page. Can be defined globally from the admin settings. Cannot be exceeded 100.'
+        required: false
+        example: 2
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanQueryParameters:
+      op: null
+      postId: null
+      distance: null
+      belongLoggedUser: false
+      pendingApproval: false
+      archived: false
+      embed: null
+      sort: created_at
+      perPage: 2
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":null,"result":{"data":[{"id":9971,"country_code":"US","user_id":1,"payment_id":null,"category_id":4,"post_type_id":2,"title":"Highlander 2022 4x4","excerpt":"Avez-vous quelque chose à vendre, à louer, un service à offrir ou une offre d''emploi? Publiez gratui...","description":"Avez-vous quelque chose à vendre, à louer, un service à offrir ou une offre d''emploi? Publiez gratuitement vos annonces ou événements sur LaraClassifier, c''est 100% gratuit, fiable, pensé business local et très facile à utiliser!","tags":["voiture","vehicule","car","motor"],"price":"9000000.00","currency_code":"USD","negotiable":0,"contact_name":"Administrator","address":null,"city_id":43751,"lat":34.75,"lon":-92.29,"create_from_ip":"::1","latest_update_ip":null,"visits":0,"auth_field":"email","email":"mayeul@domain.tld","phone":"","phone_national":"","phone_country":"us","email_token":null,"phone_token":null,"email_verified_at":"2025-05-07T03:07:47.000000Z","phone_verified_at":"2025-05-07T03:07:47.000000Z","otp_expires_at":null,"last_otp_sent_at":null,"otp_resend_attempts":0,"otp_resend_attempts_expires_at":null,"total_otp_resend_attempts":0,"locked_at":null,"phone_hidden":null,"accept_terms":0,"accept_marketing_offers":0,"is_permanent":0,"featured":0,"tmp_token":"f0ff4e16945b3338507a3513d5cf0751","reviewed_at":"2025-05-07T03:07:47.000000Z","archived_at":null,"archived_manually_at":null,"deletion_mail_sent_at":null,"created_at":"2025-05-07T03:07:47.000000Z","updated_at":"2025-05-07T03:07:47.000000Z","reference":"LYqaQk6ldnj","slug":"highlander-2022-4x4","url":"https:\/\/demo.laraclassifier.local\/highlander-2022-4x4\/LYqaQk6ldnj","phone_intl":"","created_at_formatted":"May 6th, 2025 at 23:07","updated_at_formatted":"May 6th, 2025 at 23:07","archived_at_formatted":"","archived_manually_at_formatted":"","user_photo_url":"https:\/\/demo.laraclassifier.local\/storage\/avatars\/us\/1\/thumbnails\/800x800-169751-167491006628503-100001028145118-381299-2017441-o-2-600xjpg-17061746180992.jpg","country_flag_url":"https:\/\/demo.laraclassifier.local\/images\/flags\/circle\/16\/us.png","price_label":"Price:","price_formatted":"$9,000,000","visits_formatted":"0 view","distance_info":null,"count_pictures":0,"picture":{"id":15458,"post_id":9971,"file_path":"files\/us\/9971\/01-techpoint-new-office-12jpg-81501746540991jpg-30651746587267.jpg","mime_type":"image\/jpeg","position":0,"active":1,"url":{"full":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9971\/thumbnails\/816x460-01-techpoint-new-office-12jpg-81501746540991jpg-30651746587267.jpg","small":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9971\/thumbnails\/120x90-01-techpoint-new-office-12jpg-81501746540991jpg-30651746587267.jpg","medium":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9971\/thumbnails\/320x240-01-techpoint-new-office-12jpg-81501746540991jpg-30651746587267.jpg","large":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9971\/thumbnails\/816x460-01-techpoint-new-office-12jpg-81501746540991jpg-30651746587267.jpg"}},"rating_cache":0,"rating_count":0},{"id":9970,"country_code":"US","user_id":1,"payment_id":null,"category_id":2,"post_type_id":2,"title":"Publier une annonce","excerpt":"Avez-vous quelque chose à vendre, à louer, un service à offrir ou une offre d''emploi? Publiez gratui...","description":"Avez-vous quelque chose à vendre, à louer, un service à offrir ou une offre d''emploi? Publiez gratuitement vos annonces ou événements sur LaraClassifier, c''est 100% gratuit, fiable, pensé business local et très facile à utiliser!","tags":["lola","papa","maman"],"price":"200000.00","currency_code":"USD","negotiable":0,"contact_name":"Administrator","address":null,"city_id":45045,"lat":38.79,"lon":-90.32,"create_from_ip":"::1","latest_update_ip":"::1","visits":0,"auth_field":"email","email":"mayeul@domain.tld","phone":"+15537797114","phone_national":"(553) 779-7114","phone_country":"us","email_token":null,"phone_token":null,"email_verified_at":"2025-04-20T18:55:05.000000Z","phone_verified_at":"2025-04-20T18:55:05.000000Z","otp_expires_at":null,"last_otp_sent_at":null,"otp_resend_attempts":0,"otp_resend_attempts_expires_at":null,"total_otp_resend_attempts":0,"locked_at":null,"phone_hidden":null,"accept_terms":0,"accept_marketing_offers":0,"is_permanent":0,"featured":0,"tmp_token":"bd0d759b4528e30acefa6ed14af59cfc","reviewed_at":"2025-04-20T18:55:05.000000Z","archived_at":null,"archived_manually_at":null,"deletion_mail_sent_at":null,"created_at":"2025-04-20T18:55:05.000000Z","updated_at":"2025-04-28T13:46:16.000000Z","reference":"mWZdPjzwaKg","slug":"publier-une-annonce","url":"https:\/\/demo.laraclassifier.local\/publier-une-annonce\/mWZdPjzwaKg","phone_intl":"+1 553-779-7114","created_at_formatted":"Apr 20th, 2025 at 14:55","updated_at_formatted":"Apr 28th, 2025 at 09:46","archived_at_formatted":"","archived_manually_at_formatted":"","user_photo_url":"https:\/\/demo.laraclassifier.local\/storage\/avatars\/us\/1\/thumbnails\/800x800-169751-167491006628503-100001028145118-381299-2017441-o-2-600xjpg-17061746180992.jpg","country_flag_url":"https:\/\/demo.laraclassifier.local\/images\/flags\/circle\/16\/us.png","price_label":"Price:","price_formatted":"$200,000","visits_formatted":"0 view","distance_info":null,"count_pictures":0,"picture":{"id":15456,"post_id":9970,"file_path":"files\/us\/9970\/6of9jpeg-6281745273583.jpg","mime_type":"image\/jpeg","position":0,"active":1,"url":{"full":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9970\/thumbnails\/816x460-6of9jpeg-6281745273583.jpg","small":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9970\/thumbnails\/120x90-6of9jpeg-6281745273583.jpg","medium":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9970\/thumbnails\/320x240-6of9jpeg-6281745273583.jpg","large":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9970\/thumbnails\/816x460-6of9jpeg-6281745273583.jpg"}},"rating_cache":0,"rating_count":0},{"id":9880,"country_code":"US","user_id":1048,"payment_id":null,"category_id":50,"post_type_id":1,"title":"Adult Eskimo Dog Available","excerpt":"Fugit esse quo culpa possimus accusantium. Qui tempora molestiae neque. Eligendi quos quam sint expe...","description":"Fugit esse quo culpa possimus accusantium. Qui tempora molestiae neque. Eligendi quos quam sint expedita quidem et. Ex nihil sapiente repellendus nam animi est eaque. Sint quam perspiciatis dolores exercitationem nobis aliquid laborum et. Minima incidunt unde voluptas.","tags":["necessitatibus","non","sit"],"price":"30.00","currency_code":null,"negotiable":0,"contact_name":"Casandra Corkery","address":null,"city_id":49445,"lat":37.23,"lon":-121.97,"create_from_ip":"23.171.47.96","latest_update_ip":null,"visits":845,"auth_field":"email","email":"jean.kuhlman@hotmail.com","phone":"+16611737766","phone_national":"(661) 173-7766","phone_country":"US","email_token":null,"phone_token":"demoFaker","email_verified_at":"2025-03-09T12:28:34.000000Z","phone_verified_at":"2025-03-09T12:28:34.000000Z","otp_expires_at":null,"last_otp_sent_at":null,"otp_resend_attempts":0,"otp_resend_attempts_expires_at":null,"total_otp_resend_attempts":0,"locked_at":null,"phone_hidden":0,"accept_terms":1,"accept_marketing_offers":0,"is_permanent":0,"featured":0,"tmp_token":null,"reviewed_at":"2025-03-09T12:28:34.000000Z","archived_at":null,"archived_manually_at":null,"deletion_mail_sent_at":null,"created_at":"2025-02-10T19:25:21.000000Z","updated_at":"2025-02-26T23:05:54.000000Z","reference":"GELe36Qxd69","slug":"adult-eskimo-dog-available","url":"https:\/\/demo.laraclassifier.local\/adult-eskimo-dog-available\/GELe36Qxd69","phone_intl":"(661) 173-7766","created_at_formatted":"Feb 10th, 2025 at 14:25","updated_at_formatted":"Feb 26th, 2025 at 18:05","archived_at_formatted":"","archived_manually_at_formatted":"","user_photo_url":"https:\/\/demo.laraclassifier.local\/storage\/app\/default\/user.png","country_flag_url":"https:\/\/demo.laraclassifier.local\/images\/flags\/circle\/16\/us.png","price_label":"Price:","price_formatted":"$30","visits_formatted":"845 views","distance_info":null,"count_pictures":0,"picture":{"id":15278,"post_id":9880,"file_path":"files\/us\/9880\/fe9b4956873948c53910242d21f13085.jpg","mime_type":"image\/jpeg","position":3,"active":1,"url":{"full":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9880\/thumbnails\/816x460-fe9b4956873948c53910242d21f13085.jpg","small":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9880\/thumbnails\/120x90-fe9b4956873948c53910242d21f13085.jpg","medium":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9880\/thumbnails\/320x240-fe9b4956873948c53910242d21f13085.jpg","large":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9880\/thumbnails\/816x460-fe9b4956873948c53910242d21f13085.jpg"}},"rating_cache":0,"rating_count":0},{"id":9878,"country_code":"US","user_id":235,"payment_id":null,"category_id":66,"post_type_id":2,"title":"Eum animi ad magnam","excerpt":"Perspiciatis nam necessitatibus dolores repellat commodi qui velit. Sit cupiditate eos distinctio mo...","description":"Perspiciatis nam necessitatibus dolores repellat commodi qui velit. Sit cupiditate eos distinctio molestias id incidunt. Aliquid totam minus consequatur consequatur veniam. Quis sapiente aut asperiores exercitationem autem. Libero possimus quas dolores saepe delectus ut temporibus. Ea est beatae ipsam iusto commodi temporibus. Dignissimos quo culpa accusantium ab laborum vero eos et. Quaerat ullam aperiam fugiat dolorum iusto. Et ut possimus dolorem ut qui voluptatem placeat consequatur. Ea cumque vel a velit itaque quos iure. Ut voluptatem tempora non vero qui illo molestiae.","tags":["dolorum","enim","occaecati"],"price":"573.00","currency_code":null,"negotiable":0,"contact_name":"Rogelio Hand","address":null,"city_id":45920,"lat":30.51,"lon":-97.82,"create_from_ip":"55.162.163.78","latest_update_ip":null,"visits":70,"auth_field":"email","email":"qkling@hotmail.com","phone":"+14963592438","phone_national":"(496) 359-2438","phone_country":"US","email_token":null,"phone_token":"demoFaker","email_verified_at":"2025-03-27T23:00:44.000000Z","phone_verified_at":"2025-03-27T23:00:44.000000Z","otp_expires_at":null,"last_otp_sent_at":null,"otp_resend_attempts":0,"otp_resend_attempts_expires_at":null,"total_otp_resend_attempts":0,"locked_at":null,"phone_hidden":0,"accept_terms":1,"accept_marketing_offers":1,"is_permanent":0,"featured":0,"tmp_token":null,"reviewed_at":"2025-03-27T23:00:44.000000Z","archived_at":null,"archived_manually_at":null,"deletion_mail_sent_at":null,"created_at":"2025-03-21T06:26:30.000000Z","updated_at":"2025-03-29T00:49:32.000000Z","reference":"EKQe16WPaJY","slug":"eum-animi-ad-magnam","url":"https:\/\/demo.laraclassifier.local\/eum-animi-ad-magnam\/EKQe16WPaJY","phone_intl":"(496) 359-2438","created_at_formatted":"Mar 21st, 2025 at 02:26","updated_at_formatted":"Mar 28th, 2025 at 20:49","archived_at_formatted":"","archived_manually_at_formatted":"","user_photo_url":"https:\/\/demo.laraclassifier.local\/storage\/app\/default\/user.png","country_flag_url":"https:\/\/demo.laraclassifier.local\/images\/flags\/circle\/16\/us.png","price_label":"Price:","price_formatted":"$573","visits_formatted":"70 views","distance_info":null,"count_pictures":0,"picture":{"id":15270,"post_id":9878,"file_path":"files\/us\/9878\/003f75350062e01573e381b2ce8e844b.jpg","mime_type":"image\/jpeg","position":1,"active":1,"url":{"full":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9878\/thumbnails\/816x460-003f75350062e01573e381b2ce8e844b.jpg","small":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9878\/thumbnails\/120x90-003f75350062e01573e381b2ce8e844b.jpg","medium":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9878\/thumbnails\/320x240-003f75350062e01573e381b2ce8e844b.jpg","large":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9878\/thumbnails\/816x460-003f75350062e01573e381b2ce8e844b.jpg"}},"rating_cache":0,"rating_count":0},{"id":9833,"country_code":"US","user_id":838,"payment_id":null,"category_id":71,"post_type_id":2,"title":"Vel illo excepturi in","excerpt":"Pariatur enim esse fugit dignissimos quod. Labore totam laborum minima eveniet dolore aut.","description":"Pariatur enim esse fugit dignissimos quod. Labore totam laborum minima eveniet dolore aut.","tags":["illum","autem","vero"],"price":"39658.00","currency_code":null,"negotiable":0,"contact_name":"Hertha Collins","address":null,"city_id":49344,"lat":36.32,"lon":-121.24,"create_from_ip":"87.79.251.134","latest_update_ip":null,"visits":158,"auth_field":"email","email":"carmel.hickle@hotmail.com","phone":"+14683119540","phone_national":"(468) 311-9540","phone_country":"US","email_token":null,"phone_token":"demoFaker","email_verified_at":"2025-03-20T23:35:28.000000Z","phone_verified_at":"2025-03-20T23:35:28.000000Z","otp_expires_at":null,"last_otp_sent_at":null,"otp_resend_attempts":0,"otp_resend_attempts_expires_at":null,"total_otp_resend_attempts":0,"locked_at":null,"phone_hidden":0,"accept_terms":1,"accept_marketing_offers":1,"is_permanent":0,"featured":0,"tmp_token":null,"reviewed_at":"2025-03-20T23:35:28.000000Z","archived_at":null,"archived_manually_at":null,"deletion_mail_sent_at":null,"created_at":"2025-03-17T02:34:29.000000Z","updated_at":"2025-05-17T08:23:38.911251Z","reference":"joQeZ8VRbpZ","slug":"vel-illo-excepturi-in","url":"https:\/\/demo.laraclassifier.local\/vel-illo-excepturi-in\/joQeZ8VRbpZ","phone_intl":"(468) 311-9540","created_at_formatted":"Mar 16th, 2025 at 22:34","updated_at_formatted":"May 17th, 2025 at 04:23","archived_at_formatted":"","archived_manually_at_formatted":"","user_photo_url":"https:\/\/demo.laraclassifier.local\/storage\/app\/default\/user.png","country_flag_url":"https:\/\/demo.laraclassifier.local\/images\/flags\/circle\/16\/us.png","price_label":"Price:","price_formatted":"$39,658","visits_formatted":"158 views","distance_info":null,"count_pictures":0,"picture":{"id":15200,"post_id":9833,"file_path":"files\/us\/9833\/2a8df509e0ea9aaff63a6ae8e6e9cf2c.jpg","mime_type":"image\/jpeg","position":1,"active":1,"url":{"full":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9833\/thumbnails\/816x460-2a8df509e0ea9aaff63a6ae8e6e9cf2c.jpg","small":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9833\/thumbnails\/120x90-2a8df509e0ea9aaff63a6ae8e6e9cf2c.jpg","medium":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9833\/thumbnails\/320x240-2a8df509e0ea9aaff63a6ae8e6e9cf2c.jpg","large":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9833\/thumbnails\/816x460-2a8df509e0ea9aaff63a6ae8e6e9cf2c.jpg"}},"rating_cache":0,"rating_count":0},{"id":9817,"country_code":"US","user_id":3079,"payment_id":null,"category_id":18,"post_type_id":2,"title":"Apple Pencil white color","excerpt":"Sit porro architecto quia cumque perspiciatis. Ea aliquid ut ipsam quidem quisquam eum molestias. Ip...","description":"Sit porro architecto quia cumque perspiciatis. Ea aliquid ut ipsam quidem quisquam eum molestias. Ipsam vero et odit commodi aut numquam. Accusamus et modi nisi ad aliquid. Ea incidunt suscipit in iusto facilis nesciunt. Sunt deleniti ad dolorem ipsa. Itaque hic illum ducimus omnis voluptas. Placeat labore maiores et consectetur vel.","tags":["nostrum","in","aut"],"price":"930.00","currency_code":null,"negotiable":0,"contact_name":"Fidel Hammes","address":null,"city_id":48616,"lat":40.43,"lon":-75.18,"create_from_ip":"70.83.61.79","latest_update_ip":null,"visits":751,"auth_field":"email","email":"karelle.block@gmail.com","phone":"+13397820786","phone_national":"(339) 782-0786","phone_country":"US","email_token":null,"phone_token":"demoFaker","email_verified_at":"2025-02-27T18:46:37.000000Z","phone_verified_at":"2025-02-27T18:46:37.000000Z","otp_expires_at":null,"last_otp_sent_at":null,"otp_resend_attempts":0,"otp_resend_attempts_expires_at":null,"total_otp_resend_attempts":0,"locked_at":null,"phone_hidden":0,"accept_terms":1,"accept_marketing_offers":0,"is_permanent":0,"featured":0,"tmp_token":null,"reviewed_at":"2025-02-27T18:46:37.000000Z","archived_at":null,"archived_manually_at":null,"deletion_mail_sent_at":null,"created_at":"2025-02-21T21:33:38.000000Z","updated_at":"2025-05-17T08:23:39.043257Z","reference":"oBDbDq9qdl2","slug":"apple-pencil-white-color","url":"https:\/\/demo.laraclassifier.local\/apple-pencil-white-color\/oBDbDq9qdl2","phone_intl":"(339) 782-0786","created_at_formatted":"Feb 21st, 2025 at 16:33","updated_at_formatted":"May 17th, 2025 at 04:23","archived_at_formatted":"","archived_manually_at_formatted":"","user_photo_url":"https:\/\/demo.laraclassifier.local\/storage\/app\/default\/user.png","country_flag_url":"https:\/\/demo.laraclassifier.local\/images\/flags\/circle\/16\/us.png","price_label":"Price:","price_formatted":"$930","visits_formatted":"751 views","distance_info":null,"count_pictures":0,"picture":{"id":15175,"post_id":9817,"file_path":"files\/us\/9817\/0e8ab1155f7317df6716d33e3fd05d94.jpg","mime_type":"image\/jpeg","position":1,"active":1,"url":{"full":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9817\/thumbnails\/816x460-0e8ab1155f7317df6716d33e3fd05d94.jpg","small":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9817\/thumbnails\/120x90-0e8ab1155f7317df6716d33e3fd05d94.jpg","medium":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9817\/thumbnails\/320x240-0e8ab1155f7317df6716d33e3fd05d94.jpg","large":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9817\/thumbnails\/816x460-0e8ab1155f7317df6716d33e3fd05d94.jpg"}},"rating_cache":0,"rating_count":0},{"id":9799,"country_code":"US","user_id":2541,"payment_id":null,"category_id":13,"post_type_id":1,"title":"For sale: Samsung W21 5G","excerpt":"Quaerat omnis quis sunt accusamus. Magnam ut commodi et est recusandae voluptas nihil.","description":"Quaerat omnis quis sunt accusamus. Magnam ut commodi et est recusandae voluptas nihil.","tags":["odit","optio","temporibus"],"price":"3528.00","currency_code":null,"negotiable":0,"contact_name":"Maybelle Rosenbaum","address":null,"city_id":49556,"lat":34.43,"lon":-117.65,"create_from_ip":"153.202.4.131","latest_update_ip":null,"visits":113,"auth_field":"email","email":"tebert@gmail.com","phone":"+19631520619","phone_national":"(963) 152-0619","phone_country":"US","email_token":null,"phone_token":"demoFaker","email_verified_at":"2025-03-04T11:09:58.000000Z","phone_verified_at":"2025-03-04T11:09:58.000000Z","otp_expires_at":null,"last_otp_sent_at":null,"otp_resend_attempts":0,"otp_resend_attempts_expires_at":null,"total_otp_resend_attempts":0,"locked_at":null,"phone_hidden":0,"accept_terms":1,"accept_marketing_offers":0,"is_permanent":0,"featured":0,"tmp_token":null,"reviewed_at":"2025-03-04T11:09:58.000000Z","archived_at":null,"archived_manually_at":null,"deletion_mail_sent_at":null,"created_at":"2025-01-29T03:32:42.000000Z","updated_at":"2025-05-17T08:23:39.168519Z","reference":"7LDdw0j1e1Y","slug":"for-sale-samsung-w21-5g","url":"https:\/\/demo.laraclassifier.local\/for-sale-samsung-w21-5g\/7LDdw0j1e1Y","phone_intl":"(963) 152-0619","created_at_formatted":"Jan 28th, 2025 at 22:32","updated_at_formatted":"May 17th, 2025 at 04:23","archived_at_formatted":"","archived_manually_at_formatted":"","user_photo_url":"https:\/\/demo.laraclassifier.local\/storage\/app\/default\/user.png","country_flag_url":"https:\/\/demo.laraclassifier.local\/images\/flags\/circle\/16\/us.png","price_label":"Price:","price_formatted":"$3,528","visits_formatted":"113 views","distance_info":null,"count_pictures":0,"picture":{"id":15147,"post_id":9799,"file_path":"files\/us\/9799\/57a02aeeb54bd20413f45a276d16c532.jpg","mime_type":"image\/jpeg","position":3,"active":1,"url":{"full":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9799\/thumbnails\/816x460-57a02aeeb54bd20413f45a276d16c532.jpg","small":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9799\/thumbnails\/120x90-57a02aeeb54bd20413f45a276d16c532.jpg","medium":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9799\/thumbnails\/320x240-57a02aeeb54bd20413f45a276d16c532.jpg","large":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9799\/thumbnails\/816x460-57a02aeeb54bd20413f45a276d16c532.jpg"}},"rating_cache":0,"rating_count":0},{"id":9773,"country_code":"US","user_id":1938,"payment_id":null,"category_id":59,"post_type_id":1,"title":"Ballet shoe yellow","excerpt":"Doloribus aut hic omnis provident accusamus sed. Reprehenderit veniam et aliquid vero. Similique odi...","description":"Doloribus aut hic omnis provident accusamus sed. Reprehenderit veniam et aliquid vero. Similique odit et quia fugit labore ut quos error. Dolorem voluptas autem modi architecto et. Sunt nulla eius facere. Facere aut praesentium aut possimus ipsam dolorem eveniet. Sed saepe velit enim ad iste voluptatem corrupti nulla. Omnis et ab beatae ipsa et officia alias laudantium. Reiciendis tempore ducimus rem perferendis repellendus illum aut.","tags":["qui","et","nulla"],"price":"76352.00","currency_code":null,"negotiable":0,"contact_name":"Otilia Hahn","address":null,"city_id":49244,"lat":36.1,"lon":-119.56,"create_from_ip":"236.212.223.69","latest_update_ip":null,"visits":8219,"auth_field":"email","email":"leatha63@gmail.com","phone":"+19116623591","phone_national":"(911) 662-3591","phone_country":"US","email_token":null,"phone_token":"demoFaker","email_verified_at":"2025-03-20T00:27:59.000000Z","phone_verified_at":"2025-03-20T00:27:59.000000Z","otp_expires_at":null,"last_otp_sent_at":null,"otp_resend_attempts":0,"otp_resend_attempts_expires_at":null,"total_otp_resend_attempts":0,"locked_at":null,"phone_hidden":0,"accept_terms":1,"accept_marketing_offers":1,"is_permanent":0,"featured":1,"tmp_token":null,"reviewed_at":"2025-03-20T00:27:59.000000Z","archived_at":null,"archived_manually_at":null,"deletion_mail_sent_at":null,"created_at":"2025-02-26T15:02:21.000000Z","updated_at":"2025-05-17T08:23:39.306111Z","reference":"Oy5eVvmveEP","slug":"ballet-shoe-yellow","url":"https:\/\/demo.laraclassifier.local\/ballet-shoe-yellow\/Oy5eVvmveEP","phone_intl":"(911) 662-3591","created_at_formatted":"Feb 26th, 2025 at 10:02","updated_at_formatted":"May 17th, 2025 at 04:23","archived_at_formatted":"","archived_manually_at_formatted":"","user_photo_url":"https:\/\/demo.laraclassifier.local\/storage\/app\/default\/user.png","country_flag_url":"https:\/\/demo.laraclassifier.local\/images\/flags\/circle\/16\/us.png","price_label":"Price:","price_formatted":"$76,352","visits_formatted":"8.2K views","distance_info":null,"count_pictures":0,"picture":{"id":15105,"post_id":9773,"file_path":"files\/us\/9773\/6b9729a76f41a7d5c94d774ff467e1ba.jpg","mime_type":"image\/jpeg","position":1,"active":1,"url":{"full":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9773\/thumbnails\/816x460-6b9729a76f41a7d5c94d774ff467e1ba.jpg","small":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9773\/thumbnails\/120x90-6b9729a76f41a7d5c94d774ff467e1ba.jpg","medium":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9773\/thumbnails\/320x240-6b9729a76f41a7d5c94d774ff467e1ba.jpg","large":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9773\/thumbnails\/816x460-6b9729a76f41a7d5c94d774ff467e1ba.jpg"}},"rating_cache":0,"rating_count":0},{"id":9688,"country_code":"US","user_id":3048,"payment_id":null,"category_id":59,"post_type_id":1,"title":"Slip-on shoe","excerpt":"Odit tempora ut aut officia ullam. Aut odio quia occaecati commodi et alias aut non. Perferendis arc...","description":"Odit tempora ut aut officia ullam. Aut odio quia occaecati commodi et alias aut non. Perferendis architecto perspiciatis odio accusantium reprehenderit. Culpa occaecati et repellat labore quia. Est nobis eos ipsa omnis. Reiciendis debitis non odio id rerum aut. Vel et dolorum dignissimos ullam id. Aperiam et consequatur distinctio ad assumenda ut.","tags":["ducimus","vero","quis"],"price":"620.00","currency_code":null,"negotiable":0,"contact_name":"Benedict Fadel","address":null,"city_id":50320,"lat":47.74,"lon":-122.08,"create_from_ip":"243.161.144.73","latest_update_ip":null,"visits":93,"auth_field":"email","email":"rose.hills@yahoo.com","phone":"+12088647517","phone_national":"(208) 864-7517","phone_country":"US","email_token":null,"phone_token":"demoFaker","email_verified_at":"2025-03-27T22:58:06.000000Z","phone_verified_at":"2025-03-27T22:58:06.000000Z","otp_expires_at":null,"last_otp_sent_at":null,"otp_resend_attempts":0,"otp_resend_attempts_expires_at":null,"total_otp_resend_attempts":0,"locked_at":null,"phone_hidden":0,"accept_terms":1,"accept_marketing_offers":1,"is_permanent":0,"featured":0,"tmp_token":null,"reviewed_at":"2025-03-27T22:58:06.000000Z","archived_at":null,"archived_manually_at":null,"deletion_mail_sent_at":null,"created_at":"2025-03-04T04:46:29.000000Z","updated_at":"2025-05-17T08:23:39.435035Z","reference":"WjnegpYkawZ","slug":"slip-on-shoe","url":"https:\/\/demo.laraclassifier.local\/slip-on-shoe\/WjnegpYkawZ","phone_intl":"(208) 864-7517","created_at_formatted":"Mar 3rd, 2025 at 23:46","updated_at_formatted":"May 17th, 2025 at 04:23","archived_at_formatted":"","archived_manually_at_formatted":"","user_photo_url":"https:\/\/demo.laraclassifier.local\/storage\/app\/default\/user.png","country_flag_url":"https:\/\/demo.laraclassifier.local\/images\/flags\/circle\/16\/us.png","price_label":"Price:","price_formatted":"$620","visits_formatted":"93 views","distance_info":null,"count_pictures":0,"picture":{"id":14984,"post_id":9688,"file_path":"files\/us\/9688\/89a64619902592a556f436ef84f7c252.jpg","mime_type":"image\/jpeg","position":1,"active":1,"url":{"full":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9688\/thumbnails\/816x460-89a64619902592a556f436ef84f7c252.jpg","small":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9688\/thumbnails\/120x90-89a64619902592a556f436ef84f7c252.jpg","medium":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9688\/thumbnails\/320x240-89a64619902592a556f436ef84f7c252.jpg","large":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9688\/thumbnails\/816x460-89a64619902592a556f436ef84f7c252.jpg"}},"rating_cache":0,"rating_count":0},{"id":9662,"country_code":"US","user_id":2318,"payment_id":null,"category_id":27,"post_type_id":2,"title":"Canon EOS 5D Mark IV white","excerpt":"Esse nesciunt dolores officia repellat ex. Quasi aut voluptatum aut id velit dolorum ducimus. Repell...","description":"Esse nesciunt dolores officia repellat ex. Quasi aut voluptatum aut id velit dolorum ducimus. Repellendus quaerat natus ipsum tempore vitae id necessitatibus. Temporibus saepe et cum sit molestiae fugit. Porro dolores ratione animi molestiae. Nesciunt qui tempora natus consequatur sit fugit. Quod repellendus esse sint porro optio earum. Enim aperiam earum culpa consequatur laborum reprehenderit ducimus. Dolorem et est dolor debitis. Possimus rerum dolores atque.","tags":["molestias","rem","ab"],"price":"72517.00","currency_code":null,"negotiable":0,"contact_name":"Adolfo Kling","address":null,"city_id":47323,"lat":42.13,"lon":-83.14,"create_from_ip":"88.88.204.217","latest_update_ip":null,"visits":4067,"auth_field":"email","email":"moriah.willms@gmail.com","phone":"+13198413610","phone_national":"(319) 841-3610","phone_country":"US","email_token":null,"phone_token":"demoFaker","email_verified_at":"2025-03-18T11:08:11.000000Z","phone_verified_at":"2025-03-18T11:08:11.000000Z","otp_expires_at":null,"last_otp_sent_at":null,"otp_resend_attempts":0,"otp_resend_attempts_expires_at":null,"total_otp_resend_attempts":0,"locked_at":null,"phone_hidden":0,"accept_terms":1,"accept_marketing_offers":1,"is_permanent":0,"featured":0,"tmp_token":null,"reviewed_at":"2025-03-18T11:08:11.000000Z","archived_at":null,"archived_manually_at":null,"deletion_mail_sent_at":null,"created_at":"2025-03-13T12:05:49.000000Z","updated_at":"2025-05-17T08:23:39.567655Z","reference":"K4oeE8rgd0B","slug":"canon-eos-5d-mark-iv-white","url":"https:\/\/demo.laraclassifier.local\/canon-eos-5d-mark-iv-white\/K4oeE8rgd0B","phone_intl":"(319) 841-3610","created_at_formatted":"Mar 13th, 2025 at 08:05","updated_at_formatted":"May 17th, 2025 at 04:23","archived_at_formatted":"","archived_manually_at_formatted":"","user_photo_url":"https:\/\/demo.laraclassifier.local\/storage\/app\/default\/user.png","country_flag_url":"https:\/\/demo.laraclassifier.local\/images\/flags\/circle\/16\/us.png","price_label":"Price:","price_formatted":"$72,517","visits_formatted":"4.1K views","distance_info":null,"count_pictures":0,"picture":{"id":14942,"post_id":9662,"file_path":"files\/us\/9662\/4defa6d9445f7e5188283ab1effa6aee.jpg","mime_type":"image\/jpeg","position":1,"active":1,"url":{"full":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9662\/thumbnails\/816x460-4defa6d9445f7e5188283ab1effa6aee.jpg","small":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9662\/thumbnails\/120x90-4defa6d9445f7e5188283ab1effa6aee.jpg","medium":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9662\/thumbnails\/320x240-4defa6d9445f7e5188283ab1effa6aee.jpg","large":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9662\/thumbnails\/816x460-4defa6d9445f7e5188283ab1effa6aee.jpg"}},"rating_cache":0,"rating_count":0},{"id":9627,"country_code":"US","user_id":2968,"payment_id":null,"category_id":15,"post_type_id":2,"title":"2023 MacBook Air","excerpt":"Nesciunt quae eos soluta qui nemo. Accusantium eaque et autem ratione. Sapiente quis aut aliquid qui...","description":"Nesciunt quae eos soluta qui nemo. Accusantium eaque et autem ratione. Sapiente quis aut aliquid quibusdam. Omnis quidem rerum placeat ullam quod. Quidem ea ad eos voluptatem dolorem. Dolorem debitis enim qui quia sint iure minima fugit. Tempora qui aut aperiam autem et numquam ipsam. Sunt numquam iure porro hic eligendi voluptatum corrupti reiciendis. Eos qui nam impedit quidem non. Sed temporibus numquam blanditiis qui ab pariatur illo incidunt. Eaque enim est autem voluptatum nam sint.","tags":["velit","cum"],"price":"47.00","currency_code":null,"negotiable":0,"contact_name":"Wilfred Walsh","address":null,"city_id":50569,"lat":41.88,"lon":-72.81,"create_from_ip":"179.152.121.16","latest_update_ip":null,"visits":197,"auth_field":"email","email":"gutkowski.kayden@hotmail.com","phone":"+15467218473","phone_national":"(546) 721-8473","phone_country":"US","email_token":null,"phone_token":"demoFaker","email_verified_at":"2025-03-19T20:35:30.000000Z","phone_verified_at":"2025-03-19T20:35:30.000000Z","otp_expires_at":null,"last_otp_sent_at":null,"otp_resend_attempts":0,"otp_resend_attempts_expires_at":null,"total_otp_resend_attempts":0,"locked_at":null,"phone_hidden":0,"accept_terms":1,"accept_marketing_offers":1,"is_permanent":0,"featured":1,"tmp_token":null,"reviewed_at":"2025-03-19T20:35:30.000000Z","archived_at":null,"archived_manually_at":null,"deletion_mail_sent_at":null,"created_at":"2025-03-07T20:16:19.000000Z","updated_at":"2025-05-17T08:23:39.741392Z","reference":"LYqaQn39bnj","slug":"2023-macbook-air","url":"https:\/\/demo.laraclassifier.local\/2023-macbook-air\/LYqaQn39bnj","phone_intl":"(546) 721-8473","created_at_formatted":"Mar 7th, 2025 at 15:16","updated_at_formatted":"May 17th, 2025 at 04:23","archived_at_formatted":"","archived_manually_at_formatted":"","user_photo_url":"https:\/\/demo.laraclassifier.local\/storage\/app\/default\/user.png","country_flag_url":"https:\/\/demo.laraclassifier.local\/images\/flags\/circle\/16\/us.png","price_label":"Price:","price_formatted":"$47","visits_formatted":"197 views","distance_info":null,"count_pictures":0,"picture":{"id":14890,"post_id":9627,"file_path":"files\/us\/9627\/711ba65c2dc3454ae5d2eabc95e3ce1e.jpg","mime_type":"image\/jpeg","position":1,"active":1,"url":{"full":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9627\/thumbnails\/816x460-711ba65c2dc3454ae5d2eabc95e3ce1e.jpg","small":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9627\/thumbnails\/120x90-711ba65c2dc3454ae5d2eabc95e3ce1e.jpg","medium":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9627\/thumbnails\/320x240-711ba65c2dc3454ae5d2eabc95e3ce1e.jpg","large":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9627\/thumbnails\/816x460-711ba65c2dc3454ae5d2eabc95e3ce1e.jpg"}},"rating_cache":0,"rating_count":0},{"id":9582,"country_code":"US","user_id":2291,"payment_id":null,"category_id":71,"post_type_id":1,"title":"Repellendus ducimus rerum unde odit","excerpt":"Commodi numquam ea aut id asperiores nobis et. Fugiat maxime excepturi magni consequatur dolor et. R...","description":"Commodi numquam ea aut id asperiores nobis et. Fugiat maxime excepturi magni consequatur dolor et. Rem natus reiciendis qui consequatur. Rerum perspiciatis cum nemo eos est eum expedita.","tags":["quia","natus","autem"],"price":"518.00","currency_code":null,"negotiable":0,"contact_name":"Neil Klein","address":null,"city_id":49731,"lat":33.97,"lon":-118.23,"create_from_ip":"53.236.217.4","latest_update_ip":null,"visits":29475,"auth_field":"email","email":"ssimonis@hotmail.com","phone":"+19435352427","phone_national":"(943) 535-2427","phone_country":"US","email_token":null,"phone_token":"demoFaker","email_verified_at":"2025-03-05T06:27:51.000000Z","phone_verified_at":"2025-03-05T06:27:51.000000Z","otp_expires_at":null,"last_otp_sent_at":null,"otp_resend_attempts":0,"otp_resend_attempts_expires_at":null,"total_otp_resend_attempts":0,"locked_at":null,"phone_hidden":0,"accept_terms":1,"accept_marketing_offers":1,"is_permanent":0,"featured":0,"tmp_token":null,"reviewed_at":"2025-03-05T06:27:51.000000Z","archived_at":null,"archived_manually_at":null,"deletion_mail_sent_at":null,"created_at":"2025-01-25T09:00:14.000000Z","updated_at":"2025-05-17T08:23:39.929457Z","reference":"qM7e5QjYe2v","slug":"repellendus-ducimus-rerum-unde-odit","url":"https:\/\/demo.laraclassifier.local\/repellendus-ducimus-rerum-unde-odit\/qM7e5QjYe2v","phone_intl":"(943) 535-2427","created_at_formatted":"Jan 25th, 2025 at 04:00","updated_at_formatted":"May 17th, 2025 at 04:23","archived_at_formatted":"","archived_manually_at_formatted":"","user_photo_url":"https:\/\/demo.laraclassifier.local\/storage\/app\/default\/user.png","country_flag_url":"https:\/\/demo.laraclassifier.local\/images\/flags\/circle\/16\/us.png","price_label":"Price:","price_formatted":"$518","visits_formatted":"29.5K views","distance_info":null,"count_pictures":0,"picture":{"id":14821,"post_id":9582,"file_path":"files\/us\/9582\/05749c3b8b0ff7e82ccd956cdea5ebd0.jpg","mime_type":"image\/jpeg","position":1,"active":1,"url":{"full":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9582\/thumbnails\/816x460-05749c3b8b0ff7e82ccd956cdea5ebd0.jpg","small":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9582\/thumbnails\/120x90-05749c3b8b0ff7e82ccd956cdea5ebd0.jpg","medium":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9582\/thumbnails\/320x240-05749c3b8b0ff7e82ccd956cdea5ebd0.jpg","large":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/9582\/thumbnails\/816x460-05749c3b8b0ff7e82ccd956cdea5ebd0.jpg"}},"rating_cache":0,"rating_count":0}],"links":{"first":"https:\/\/demo.laraclassifier.local\/api\/posts?page=1","last":"https:\/\/demo.laraclassifier.local\/api\/posts?page=21","prev":null,"next":"https:\/\/demo.laraclassifier.local\/api\/posts?page=2"},"meta":{"current_page":1,"from":1,"last_page":21,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"https:\/\/demo.laraclassifier.local\/api\/posts?page=1","label":"1","active":true},{"url":"https:\/\/demo.laraclassifier.local\/api\/posts?page=2","label":"2","active":false},{"url":"https:\/\/demo.laraclassifier.local\/api\/posts?page=3","label":"3","active":false},{"url":"https:\/\/demo.laraclassifier.local\/api\/posts?page=4","label":"4","active":false},{"url":"https:\/\/demo.laraclassifier.local\/api\/posts?page=5","label":"5","active":false},{"url":"https:\/\/demo.laraclassifier.local\/api\/posts?page=6","label":"6","active":false},{"url":"https:\/\/demo.laraclassifier.local\/api\/posts?page=7","label":"7","active":false},{"url":"https:\/\/demo.laraclassifier.local\/api\/posts?page=8","label":"8","active":false},{"url":"https:\/\/demo.laraclassifier.local\/api\/posts?page=9","label":"9","active":false},{"url":"https:\/\/demo.laraclassifier.local\/api\/posts?page=10","label":"10","active":false},{"url":null,"label":"...","active":false},{"url":"https:\/\/demo.laraclassifier.local\/api\/posts?page=20","label":"20","active":false},{"url":"https:\/\/demo.laraclassifier.local\/api\/posts?page=21","label":"21","active":false},{"url":"https:\/\/demo.laraclassifier.local\/api\/posts?page=2","label":"Next &raquo;","active":false}],"path":"https:\/\/demo.laraclassifier.local\/api\/posts","per_page":12,"to":12,"total":251}}}'
+        headers:
+          content-type: 'application/json; charset=UTF-8'
+          cache-control: 'no-cache, private'
+          vary: Origin
+        description: null
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: 'api/posts/{id}'
+    metadata:
+      groupName: Listings
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get listing'
+      description: |-
+        Note: The main picture of the listing is fetched via a 'picture' attribute (added as fake column),
+        that provide default picture as image placeholder when the listing has no pictures.
+        In addition, for performance reasons, default picture is also provided when the 'pictures' table is not embed in the endpoint.
+        So you need to embed the picture table like: /api/posts/1?embed=pictures to retrieve right main picture data.
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+      Content-Language: en
+      X-AppApiToken: Uk1DSFlVUVhIRXpHbWt6d2pIZjlPTG15akRPN2tJTUs=
+      X-AppType: docs
+    urlParameters:
+      id:
+        name: id
+        description: "The post/listing's ID."
+        required: true
+        example: 2
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 2
+    queryParameters:
+      unactivatedIncluded:
+        name: unactivatedIncluded
+        description: 'Include or not unactivated entries - Possible value: 0 or 1.'
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      belongLoggedUser:
+        name: belongLoggedUser
+        description: 'Force users to be logged to get data that belongs to him - Possible value: 0 or 1.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      noCache:
+        name: noCache
+        description: 'Disable the cache for this request - Possible value: 0 or 1.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      embed:
+        name: embed
+        description: 'Comma-separated list of the post relationships for Eager Loading - Possible values: user,category,parent,postType,city,currency,savedByLoggedUser,pictures,payment,package,fieldsValues.'
+        required: false
+        example: 'user,postType'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      detailed:
+        name: detailed
+        description: "Allow getting the listing's details with all its relationships (No need to set the 'embed' parameter)."
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanQueryParameters:
+      unactivatedIncluded: true
+      belongLoggedUser: false
+      noCache: false
+      embed: 'user,postType'
+      detailed: false
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":null,"result":{"id":2,"country_code":"US","user_id":2,"payment_id":null,"category_id":128,"post_type_id":1,"title":"Voluptas inventore repellendus veniam","excerpt":"Tenetur sed impedit ullam est sint libero minima qui. Alias laboriosam omnis quisquam nemo et tenetu...","description":"Tenetur sed impedit ullam est sint libero minima qui. Alias laboriosam omnis quisquam nemo et tenetur. Corporis veritatis natus voluptatem in vitae est consequuntur. Tempora vel nam deserunt explicabo nesciunt. Ab et est delectus facilis iure ut. Sapiente ratione blanditiis quaerat nemo. Earum et dolorem sed temporibus vel est laudantium. Et aperiam maxime sequi ut id consequatur. Est est harum corporis dolorem ratione officia. Enim iste autem in aut.","tags":["et","dolores","voluptatum"],"price":"75594.00","currency_code":null,"negotiable":0,"contact_name":"Admin Demo","address":null,"city_id":46920,"lat":42.11,"lon":-87.74,"create_from_ip":"246.76.57.28","latest_update_ip":null,"visits":96,"auth_field":"email","email":"admin@domain.tld","phone":"+18333836966","phone_national":"(833) 383-6966","phone_country":"US","email_token":null,"phone_token":"demoFaker","email_verified_at":"2025-03-09T22:30:09.000000Z","phone_verified_at":"2025-03-09T22:30:09.000000Z","otp_expires_at":null,"last_otp_sent_at":null,"otp_resend_attempts":0,"otp_resend_attempts_expires_at":null,"total_otp_resend_attempts":0,"locked_at":null,"phone_hidden":0,"accept_terms":1,"accept_marketing_offers":0,"is_permanent":0,"featured":1,"tmp_token":null,"reviewed_at":"2025-03-09T22:30:09.000000Z","archived_at":null,"archived_manually_at":null,"deletion_mail_sent_at":null,"created_at":"2025-02-14T15:40:02.000000Z","updated_at":"2025-05-17T08:23:41.000000Z","reference":"GWpmbk5ezJn","slug":"voluptas-inventore-repellendus-veniam","url":"https:\/\/demo.laraclassifier.local\/voluptas-inventore-repellendus-veniam\/GWpmbk5ezJn","phone_intl":"(833) 383-6966","created_at_formatted":"3 months ago","updated_at_formatted":"May 17th, 2025 at 04:23","archived_at_formatted":"","archived_manually_at_formatted":"","user_photo_url":"https:\/\/demo.laraclassifier.local\/storage\/avatars\/us\/2\/thumbnails\/800x800-41ccbeb517f138cf49aa5048e8f07b68.jpg","country_flag_url":"https:\/\/demo.laraclassifier.local\/images\/flags\/circle\/16\/us.png","price_label":"Price:","price_formatted":"$75,594","visits_formatted":"96 views","distance_info":null,"count_pictures":0,"picture":{"id":4,"post_id":2,"file_path":"files\/us\/2\/eb4a05e800c6ea5fbf9d16171777fce3.jpg","mime_type":"image\/jpeg","position":1,"active":1,"url":{"full":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/2\/thumbnails\/816x460-eb4a05e800c6ea5fbf9d16171777fce3.jpg","small":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/2\/thumbnails\/120x90-eb4a05e800c6ea5fbf9d16171777fce3.jpg","medium":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/2\/thumbnails\/320x240-eb4a05e800c6ea5fbf9d16171777fce3.jpg","large":"https:\/\/demo.laraclassifier.local\/storage\/files\/us\/2\/thumbnails\/816x460-eb4a05e800c6ea5fbf9d16171777fce3.jpg"}},"user":{"id":2,"name":"Admin Demo","username":null,"two_factor_enabled":false,"two_factor_method":"email","updated_at":"2025-01-21T16:23:44.000000Z","original_updated_at":"2025-01-21 16:23:44","original_last_activity":null,"created_at_formatted":"1 year ago","photo_url":"https:\/\/demo.laraclassifier.local\/storage\/avatars\/us\/2\/thumbnails\/800x800-41ccbeb517f138cf49aa5048e8f07b68.jpg","p_is_online":false,"country_flag_url":"https:\/\/demo.laraclassifier.local\/images\/flags\/circle\/16\/us.png"},"postType":{"id":1,"name":"INDIVIDUAL","label":"Individual"},"rating_cache":0,"rating_count":0},"extra":{"fieldsValues":[]}}'
+        headers:
+          content-type: 'application/json; charset=UTF-8'
+          cache-control: 'no-cache, private'
+          vary: Origin
+        description: null
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/posts
+    metadata:
+      groupName: Listings
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Store listing'
+      description: |-
+        For both types of listing's creation (Single step or Multi steps).
+        Note: The field 'admin_code' is only available when the listing's country's 'admin_type' column is set to 1 or 2.
+      authenticated: true
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_TOKEN}'
+      Content-Type: multipart/form-data
+      Accept: application/json
+      Content-Language: en
+      X-AppApiToken: Uk1DSFlVUVhIRXpHbWt6d2pIZjlPTG15akRPN2tJTUs=
+      X-AppType: docs
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      category_id:
+        name: category_id
+        description: "The category's ID."
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      post_type_id:
+        name: post_type_id
+        description: "The listing type's ID."
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      title:
+        name: title
+        description: "The listing's title."
+        required: true
+        example: 'John Doe'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      description:
+        name: description
+        description: "The listing's description."
+        required: true
+        example: 'Beatae placeat atque tempore consequatur animi magni omnis.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      contact_name:
+        name: contact_name
+        description: "The listing's author name."
+        required: true
+        example: 'John Doe'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      auth_field:
+        name: auth_field
+        description: "The user's auth field ('email' or 'phone')."
+        required: true
+        example: email
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      phone:
+        name: phone
+        description: "The listing's author mobile number (Required when 'auth_field' value is 'phone')."
+        required: false
+        example: '+17656766467'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      phone_country:
+        name: phone_country
+        description: "The user's phone number's country code (Required when the 'phone' field is filled)."
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      city_id:
+        name: city_id
+        description: "The city's ID."
+        required: true
+        example: 8
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      accept_terms:
+        name: accept_terms
+        description: 'Accept the website terms and conditions.'
+        required: true
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      pictures:
+        name: pictures
+        description: "The listing's pictures."
+        required: true
+        example:
+          - null
+        type: 'file[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      admin_code:
+        name: admin_code
+        description: "The administrative division's code."
+        required: false
+        example: '0'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      email:
+        name: email
+        description: "The listing's author email address (Required when 'auth_field' value is 'email')."
+        required: false
+        example: john.doe@domain.tld
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      country_code:
+        name: country_code
+        description: "The code of the user's country."
+        required: true
+        example: US
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      price:
+        name: price
+        description: 'The price.'
+        required: true
+        example: 5000
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      negotiable:
+        name: negotiable
+        description: 'Negotiable price or no.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      phone_hidden:
+        name: phone_hidden
+        description: 'Mobile phone number will be hidden in public or no.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      create_from_ip:
+        name: create_from_ip
+        description: "The listing's author IP address."
+        required: false
+        example: 127.0.0.1
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      accept_marketing_offers:
+        name: accept_marketing_offers
+        description: 'Accept to receive marketing offers or no.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      is_permanent:
+        name: is_permanent
+        description: 'Is it permanent post or no.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      tags:
+        name: tags
+        description: 'Comma-separated tags list.'
+        required: false
+        example: 'car,automotive,tesla,cyber,truck'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      package_id:
+        name: package_id
+        description: "The package's ID."
+        required: true
+        example: 2
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      payment_method_id:
+        name: payment_method_id
+        description: "The payment method's ID (required when the selected package's price is > 0)."
+        required: false
+        example: 5
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      captcha_key:
+        name: captcha_key
+        description: 'Key generated by the CAPTCHA endpoint calling (Required when the CAPTCHA verification is enabled from the Admin panel).'
+        required: false
+        example: ullam
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      category_id: 1
+      post_type_id: 1
+      title: 'John Doe'
+      description: 'Beatae placeat atque tempore consequatur animi magni omnis.'
+      contact_name: 'John Doe'
+      auth_field: email
+      phone: '+17656766467'
+      phone_country: null
+      city_id: 8
+      accept_terms: false
+      admin_code: '0'
+      email: john.doe@domain.tld
+      country_code: US
+      price: 5000
+      negotiable: false
+      phone_hidden: false
+      create_from_ip: 127.0.0.1
+      accept_marketing_offers: false
+      is_permanent: false
+      tags: 'car,automotive,tesla,cyber,truck'
+      package_id: 2
+      payment_method_id: 5
+      captcha_key: ullam
+    fileParameters:
+      pictures:
+        - null
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer bZ8e5h4a6v3Dd6VP1kagEfc'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - PUT
+    uri: 'api/posts/{id}'
+    metadata:
+      groupName: Listings
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update listing'
+      description: |-
+        Note: The fields 'pictures', 'package_id' and 'payment_method_id' are only available with the single step listing edition.
+        The field 'admin_code' is only available when the listing's country's 'admin_type' column is set to 1 or 2.
+      authenticated: true
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_TOKEN}'
+      Content-Type: multipart/form-data
+      Accept: application/json
+      Content-Language: en
+      X-AppApiToken: Uk1DSFlVUVhIRXpHbWt6d2pIZjlPTG15akRPN2tJTUs=
+      X-AppType: docs
+    urlParameters:
+      id:
+        name: id
+        description: "The post/listing's ID."
+        required: true
+        example: 6
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 6
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      category_id:
+        name: category_id
+        description: "The category's ID."
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      post_type_id:
+        name: post_type_id
+        description: "The listing type's ID."
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      title:
+        name: title
+        description: "The listing's title."
+        required: true
+        example: 'John Doe'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      description:
+        name: description
+        description: "The listing's description."
+        required: true
+        example: 'Beatae placeat atque tempore consequatur animi magni omnis.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      contact_name:
+        name: contact_name
+        description: "The listing's author name."
+        required: true
+        example: 'John Doe'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      auth_field:
+        name: auth_field
+        description: "The user's auth field ('email' or 'phone')."
+        required: true
+        example: email
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      phone:
+        name: phone
+        description: "The listing's author mobile number (Required when 'auth_field' value is 'phone')."
+        required: false
+        example: '+17656766467'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      phone_country:
+        name: phone_country
+        description: "The user's phone number's country code (Required when the 'phone' field is filled)."
+        required: true
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      city_id:
+        name: city_id
+        description: "The city's ID."
+        required: true
+        example: 20
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      accept_terms:
+        name: accept_terms
+        description: 'Accept the website terms and conditions.'
+        required: true
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      admin_code:
+        name: admin_code
+        description: "The administrative division's code."
+        required: false
+        example: '0'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      email:
+        name: email
+        description: "The listing's author email address (Required when 'auth_field' value is 'email')."
+        required: false
+        example: john.doe@domain.tld
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      country_code:
+        name: country_code
+        description: "The code of the user's country."
+        required: true
+        example: US
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      price:
+        name: price
+        description: 'The price.'
+        required: true
+        example: 5000
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      negotiable:
+        name: negotiable
+        description: 'Negotiable price or no.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      phone_hidden:
+        name: phone_hidden
+        description: 'Mobile phone number will be hidden in public or no.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      latest_update_ip:
+        name: latest_update_ip
+        description: "The listing's author IP address."
+        required: false
+        example: 127.0.0.1
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      accept_marketing_offers:
+        name: accept_marketing_offers
+        description: 'Accept to receive marketing offers or no.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      is_permanent:
+        name: is_permanent
+        description: 'Is it permanent post or no.'
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      tags:
+        name: tags
+        description: 'Comma-separated tags list.'
+        required: false
+        example: 'car,automotive,tesla,cyber,truck'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      pictures:
+        name: pictures
+        description: "The listing's pictures."
+        required: true
+        example:
+          - null
+        type: 'file[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      package_id:
+        name: package_id
+        description: "The package's ID."
+        required: true
+        example: 2
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      payment_method_id:
+        name: payment_method_id
+        description: "The payment method's ID (Required when the selected package's price is > 0)."
+        required: false
+        example: 5
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      category_id: 1
+      post_type_id: 1
+      title: 'John Doe'
+      description: 'Beatae placeat atque tempore consequatur animi magni omnis.'
+      contact_name: 'John Doe'
+      auth_field: email
+      phone: '+17656766467'
+      phone_country: null
+      city_id: 20
+      accept_terms: false
+      admin_code: '0'
+      email: john.doe@domain.tld
+      country_code: US
+      price: 5000
+      negotiable: false
+      phone_hidden: false
+      latest_update_ip: 127.0.0.1
+      accept_marketing_offers: false
+      is_permanent: true
+      tags: 'car,automotive,tesla,cyber,truck'
+      package_id: 2
+      payment_method_id: 5
+    fileParameters:
+      pictures:
+        - null
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer d4eV1ca36f6avEbg85ZhkDP'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - DELETE
+    uri: 'api/posts/{ids}'
+    metadata:
+      groupName: Listings
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Delete listing(s)'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+      Content-Language: en
+      X-AppApiToken: Uk1DSFlVUVhIRXpHbWt6d2pIZjlPTG15akRPN2tJTUs=
+      X-AppType: docs
+    urlParameters:
+      ids:
+        name: ids
+        description: 'The ID or comma-separated IDs list of listing(s).'
+        required: true
+        example: '111111,222222,333333'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      ids: '111111,222222,333333'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer c8bvkEZ66h341DPg5eaaVdf'
+    controller: null
+    method: null
+    route: null
+    custom: []
