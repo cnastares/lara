@@ -555,7 +555,8 @@ class PhotoController extends BaseController
                 $newPicturesInput = array_merge($savedPicturesInput, $picturesInput);
                 session()->put('picturesInput', $newPicturesInput);
 
-                $this->cleanupOldTempFiles();
+                // Avoid deleting temporary files here. Cleanup will be
+                // performed later by a scheduled command.
 
                 return response()->json([
                         'message' => 'Archivos subidos correctamente',
@@ -565,7 +566,10 @@ class PhotoController extends BaseController
         
         private function cleanupOldTempFiles()
         {
-                // Use local disk to clean temporary files
+                // Kept for reference. Actual deletion should be handled by a
+                // scheduled command to avoid removing files before they are
+                // processed.
+
                 $disk = StorageDisk::getDisk('local');
                 $tempDir = $disk->path('temporary');
 
@@ -578,8 +582,7 @@ class PhotoController extends BaseController
 
                 foreach ($files as $file) {
                         if (is_file($file) && ($now - filemtime($file)) >= 3600) {
-                                unlink($file);
-                                Log::debug('Cleaned old temp file', ['file' => basename($file)]);
+                                Log::debug('Old temp file detected', ['file' => basename($file)]);
                         }
                 }
         }
