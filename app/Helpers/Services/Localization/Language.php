@@ -308,9 +308,14 @@ class Language
 			return collect();
 		}
 		
-		// $locale = 'en'; // debug
-		$countryLang = new CountryHelper();
-		$tab = [];
+                // $locale = 'en'; // debug
+                try {
+                        $countryLang = new CountryHelper();
+                } catch (\InvalidArgumentException $e) {
+                        return collect();
+                }
+
+                $tab = [];
 		foreach ($countries as $code => $country) {
 			$tab[$code] = $country;
 			if ($name = $countryLang->get($code, $locale, $source)) {
@@ -340,13 +345,18 @@ class Language
 			return collect();
 		}
 		
-		// $locale = 'en'; // debug
-		$countryLang = new CountryHelper();
-		if ($name = $countryLang->get($country->get('code'), $locale, $source)) {
-			return $country->merge(['name' => $name]);
-		} else {
-			return $country;
-		}
+                // $locale = 'en'; // debug
+                try {
+                        $countryLang = new CountryHelper();
+                } catch (\InvalidArgumentException $e) {
+                        return $country;
+                }
+
+                if ($name = $countryLang->get($country->get('code'), $locale, $source)) {
+                        return $country->merge(['name' => $name]);
+                } else {
+                        return $country;
+                }
 	}
 	
 	/**

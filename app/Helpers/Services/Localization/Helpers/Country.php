@@ -48,17 +48,17 @@ class Country
 	 */
 	protected $countries = [];
 	
-	public function __construct($dataDir = null)
-	{
-		if (isset($dataDir)) {
-			if (!is_dir($dataDir)) {
-				die(sprintf('Unable to locate the country data directory at "%s"', $dataDir));
-			}
-			$this->dataDir = $dataDir;
-		} else {
-			$this->dataDir = base_path('database/umpirsky/country');
-		}
-	}
+        public function __construct($dataDir = null)
+        {
+                if (isset($dataDir)) {
+                        if (!is_dir($dataDir)) {
+                                throw new \InvalidArgumentException(sprintf('Unable to locate the country data directory at "%s"', $dataDir));
+                        }
+                        $this->dataDir = $dataDir;
+                } else {
+                        $this->dataDir = base_path('database/umpirsky/country');
+                }
+        }
 	
 	/**
 	 * Returns one country.

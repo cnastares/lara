@@ -112,10 +112,14 @@ class Handler extends ExceptionHandler
 				}
 			}
 			
-			if (appInstallFilesExist()) {
-				$this->sendNotification($e);
-			}
-		});
+                        if (appInstallFilesExist()) {
+                                try {
+                                        $this->sendNotification($e);
+                                } catch (\Throwable $notificationException) {
+                                        // Do not interrupt the reporting process if notification fails
+                                }
+                        }
+                });
 		
 		/*
 		 * Render an exception into an HTTP response
