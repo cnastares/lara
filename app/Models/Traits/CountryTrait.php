@@ -85,8 +85,12 @@ trait CountryTrait
 		$languages = DB::table((new Language())->getTable())->get();
 		$oldEntries = DB::table($tableName)->get();
 		
-		if ($oldEntries->count() > 0) {
-			$transCountry = new CountryHelper();
+                if ($oldEntries->count() > 0) {
+                        try {
+                                $transCountry = new CountryHelper();
+                        } catch (\InvalidArgumentException $e) {
+                                return;
+                        }
 			foreach ($oldEntries as $oldEntry) {
 				$newNames = [];
 				

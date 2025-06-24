@@ -129,17 +129,17 @@ class Curl
 		$error = curl_error($ch);
 		curl_close($ch);
 		
-		if ($buffer) {
-			if (file_exists($saveTo)) {
-				unlink($saveTo);
-			}
-			if (self::filePutContents($saveTo, $buffer) === false) {
-				die($url . " doesn't save at " . $saveTo . ".\n");
-			}
-		} else {
-			die($error);
-		}
-	}
+                if ($buffer) {
+                        if (file_exists($saveTo)) {
+                                unlink($saveTo);
+                        }
+                        if (!self::filePutContents($saveTo, $buffer)) {
+                                throw new \RuntimeException($url . " doesn't save at " . $saveTo . ".\n");
+                        }
+                } else {
+                        throw new \RuntimeException($error);
+                }
+        }
 	
 	/**
 	 * @param $url
@@ -233,8 +233,8 @@ class Curl
 	 * @param int $flags
 	 * @param null $context
 	 */
-	public static function filePutContents($filename, $data, int $flags = 0, $context = null): void
-	{
+        public static function filePutContents($filename, $data, int $flags = 0, $context = null): bool
+        {
 		$tmp = explode('/', $filename);
 		$shortFilename = array_pop($tmp);
 		
@@ -248,6 +248,6 @@ class Curl
 		
 		$filename = $filePath . '/' . $shortFilename;
 		
-		file_put_contents($filename, $data, $flags, $context);
-	}
+                return file_put_contents($filename, $data, $flags, $context) !== false;
+        }
 }

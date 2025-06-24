@@ -27,9 +27,9 @@ trait NotificationTrait
 	 */
 	public function sendNotification(\Throwable $e): void
 	{
-		if ($this->isFullMemoryException($e)) {
-			die($e->getMessage());
-		}
+                if ($this->isFullMemoryException($e)) {
+                        throw $e;
+                }
 		
 		if (appIsBeingInstalled()) {
 			return;
