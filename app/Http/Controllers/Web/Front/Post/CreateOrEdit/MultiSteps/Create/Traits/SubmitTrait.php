@@ -55,12 +55,16 @@ trait SubmitTrait
 		Log::info('Storage configuration verification', [
 			'default_disk' => config('filesystems.default'),
 			'local_disk_config' => config('filesystems.disks.local'),
+			'public_disk_config' => config('filesystems.disks.public'),
 			'storage_app_path' => storage_path('app'),
 			'storage_app_exists' => is_dir(storage_path('app')),
 			'storage_app_writable' => is_writable(storage_path('app')),
 			'temporary_directory' => storage_path('app/temporary'),
 			'temporary_dir_exists' => is_dir(storage_path('app/temporary')),
-			'temporary_dir_writable' => is_writable(storage_path('app/temporary'))
+			'temporary_dir_writable' => is_writable(storage_path('app/temporary')),
+			'public_storage_path' => storage_path('app/public'),
+			'public_storage_exists' => is_dir(storage_path('app/public')),
+			'public_storage_writable' => is_writable(storage_path('app/public'))
 		]);
 		
 		// AGREGAR LOG: Verificar tablas relacionadas con imágenes
@@ -77,8 +81,18 @@ trait SubmitTrait
 			]);
 		}
 		
+		// AGREGAR LOG: Verificar configuración de storage para archivos temporales
+		Log::info('Temporary file storage verification', [
+			'local_disk_root' => config('filesystems.disks.local.root'),
+			'public_disk_root' => config('filesystems.disks.public.root'),
+			'temp_files_in_local' => Storage::disk('local')->files('temporary'),
+			'temp_files_in_public' => Storage::disk('public')->files('temporary'),
+			'all_temp_files_local' => Storage::disk('local')->allFiles('temporary'),
+			'all_temp_files_public' => Storage::disk('public')->allFiles('temporary')
+		]);
+		
 		// AGREGAR LOG: Estado inicial de los datos
-		\Log::info('Starting storeInputDataInDatabase', [
+		Log::info('Starting storeInputDataInDatabase', [
 			'post_input_count' => count($postInput),
 			'pictures_input_count' => count($picturesInput),
 			'pictures_input' => $picturesInput,
@@ -89,7 +103,7 @@ trait SubmitTrait
 			$postStep = $this->getStepByKey(PostController::class);
 			$postStepUrl = $this->getNextStepUrl($postStep);
 			
-			\Log::warning('No post input found, redirecting to post step');
+			Log::warning('No post input found, redirecting to post step');
 			return redirect()->to($postStepUrl);
 		}
 		
@@ -112,7 +126,7 @@ trait SubmitTrait
 		}
 		
 		// AGREGAR LOG: ANTES de procesar las imágenes
-		\Log::info('Starting image processing in storeInputDataInDatabase', [
+		Log::info('Starting image processing in storeInputDataInDatabase', [
 			'pictures_input_count' => count($picturesInput ?? []),
 			'pictures_input' => $picturesInput ?? [],
 		]);
@@ -201,7 +215,7 @@ trait SubmitTrait
 		}
 		
 		// AGREGAR LOG: DESPUÉS de procesar todas las imágenes
-		\Log::info('Completed image processing', [
+		Log::info('Completed image processing', [
 			'final_pictures_count' => count($inputArray['pictures']),
 			'final_pictures_array' => array_map(function($file) {
 				return [
@@ -224,7 +238,7 @@ trait SubmitTrait
 			if (is_array($uploadedPictures)) {
 				$request->files->set('pictures', $uploadedPictures);
 				
-				\Log::info('Set pictures in request files', [
+				Log::info('Set pictures in request files', [
 					'pictures_count' => count($uploadedPictures),
 					'request_has_pictures' => $request->hasFile('pictures'),
 					'request_files_count' => count($request->allFiles()),
@@ -233,7 +247,7 @@ trait SubmitTrait
 		}
 		
 		// AGREGAR LOG: ANTES de guardar en BD
-		\Log::info('About to call postService->store', [
+		Log::info('About to call postService->store', [
 			'request_has_pictures' => $request->hasFile('pictures'),
 			'request_files_count' => count($request->allFiles()),
 			'input_array_keys' => array_keys($inputArray),
@@ -244,7 +258,7 @@ trait SubmitTrait
 			$data = getServiceData($this->postService->store($request));
 			
 			// AGREGAR LOG: DESPUÉS de guardar en BD
-			\Log::info('Post service store completed', [
+			Log::info('Post service store completed', [
 				'success' => data_get($data, 'success'),
 				'post_id' => data_get($data, 'result.id'),
 				'message' => data_get($data, 'message'),
@@ -252,7 +266,7 @@ trait SubmitTrait
 			]);
 			
 		} catch (\Exception $e) {
-			\Log::error('Error in postService->store', [
+			Log::error('Error in postService->store', [
 				'error_message' => $e->getMessage(),
 				'error_file' => $e->getFile(),
 				'error_line' => $e->getLine(),
@@ -281,7 +295,7 @@ trait SubmitTrait
 			// Clear Temporary Inputs & Files
 			$this->clearTemporaryInput();
 			
-			\Log::info('Post created successfully', [
+			Log::info('Post created successfully', [
 				'post_id' => $postId,
 				'message' => $message,
 			]);
@@ -289,7 +303,7 @@ trait SubmitTrait
 			$message = $message ?? t('unknown_error');
 			flash($message)->error();
 			
-			\Log::error('Post creation failed', [
+			Log::error('Post creation failed', [
 				'message' => $message,
 				'data' => $data,
 			]);
@@ -308,7 +322,7 @@ trait SubmitTrait
 		abort_if(empty($post), 404, t('post_not_found'));
 		
 		// AGREGAR LOG: Verificar el post creado
-		\Log::info('Post resource retrieved', [
+		Log::info('Post resource retrieved', [
 			'post_id' => data_get($post, 'id'),
 			'post_attributes' => array_keys(data_get($post, 'attributes', [])),
 			'post_has_pictures' => isset($post['pictures']),
@@ -383,7 +397,7 @@ trait SubmitTrait
 			}
 		}
 		
-		\Log::info('storeInputDataInDatabase completed successfully', [
+		Log::info('storeInputDataInDatabase completed successfully', [
 			'post_id' => $postId,
 			'next_url' => $nextUrl,
 		]);

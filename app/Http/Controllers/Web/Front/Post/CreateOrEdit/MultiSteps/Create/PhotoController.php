@@ -393,7 +393,7 @@ class PhotoController extends BaseController
 
         public function uploadPhotos(Request $request): JsonResponse
         {
-                \Log::debug('PHP Upload Configuration', [
+                Log::debug('PHP Upload Configuration', [
                         'upload_max_filesize' => ini_get('upload_max_filesize'),
                         'post_max_size'       => ini_get('post_max_size'),
                         'max_file_uploads'    => ini_get('max_file_uploads'),
@@ -402,13 +402,13 @@ class PhotoController extends BaseController
                         'tmp_dir'             => sys_get_temp_dir(),
                 ]);
 
-                \Log::debug('Upload request received', [
+                Log::debug('Upload request received', [
                         'files_count'  => count($request->allFiles()),
                         'has_pictures' => $request->hasFile('pictures'),
                         'request_data' => $request->except(['_token', 'pictures'])
                 ]);
 
-                \Log::debug('Detailed file analysis', [
+                Log::debug('Detailed file analysis', [
                         'total_files' => is_countable($request->file('pictures')) ? count($request->file('pictures')) : 0,
                         'file_details' => array_map(function ($file, $index) {
                                 return [
@@ -429,7 +429,7 @@ class PhotoController extends BaseController
                 ]);
 
                 if (!$request->hasFile('pictures')) {
-                        \Log::warning('No pictures in upload request');
+                        Log::warning('No pictures in upload request');
 
                         return response()->json(['error' => 'No se encontraron archivos para subir.'], 422);
                 }
@@ -450,7 +450,7 @@ class PhotoController extends BaseController
                 $picturesLimit = $defaultPicturesLimit - $countExistingPictures;
 
                 foreach ($request->file('pictures') as $index => $file) {
-                        \Log::debug('Processing file', [
+                        Log::debug('Processing file', [
                                 'index'         => $index,
                                 'original_name' => $file->getClientOriginalName(),
                                 'temp_path'     => $file->getPathname(),
@@ -463,7 +463,7 @@ class PhotoController extends BaseController
                         ]);
 
                         if (!$file->isValid()) {
-                                \Log::error('Invalid file detected', [
+                                Log::error('Invalid file detected', [
                                         'file'         => $file->getClientOriginalName(),
                                         'error_code'   => $file->getError(),
                                         'error_message'=> $file->getErrorMessage(),
@@ -475,7 +475,7 @@ class PhotoController extends BaseController
                         // Verificar que el archivo temporal existe y es legible
                         $tempPath = $file->getRealPath() ?: $file->getPathname();
                         if (empty($tempPath) || !file_exists($tempPath)) {
-                                \Log::error('Temporary file not accessible', [
+                                Log::error('Temporary file not accessible', [
                                         'file'         => $file->getClientOriginalName(),
                                         'temp_path'    => $file->getPathname(),
                                         'real_path'    => $file->getRealPath(),
@@ -485,7 +485,7 @@ class PhotoController extends BaseController
                         }
 
                         if (!is_readable($tempPath)) {
-                                \Log::error('Temporary file not readable', [
+                                Log::error('Temporary file not readable', [
                                         'file'         => $file->getClientOriginalName(),
                                         'temp_path'    => $tempPath,
                                 ]);
@@ -500,7 +500,7 @@ class PhotoController extends BaseController
                         }
 
                         if (!is_string($filePath)) {
-                                \Log::error('Image upload failed', [
+                                Log::error('Image upload failed', [
                                         'name' => $file->getClientOriginalName(),
                                         'type' => gettype($filePath),
                                 ]);
@@ -509,12 +509,12 @@ class PhotoController extends BaseController
                         }
 
                         if ($filePath === null) {
-                                \Log::error('Image upload failed', ['name' => $file->getClientOriginalName()]);
+                                Log::error('Image upload failed', ['name' => $file->getClientOriginalName()]);
                         } else {
-                                \Log::info('Image uploaded', ['path' => $filePath]);
+                                Log::info('Image uploaded', ['path' => $filePath]);
 
                                 // AGREGAR LOG: ANTES de guardar el archivo temporal
-                                \Log::info('Before saving temporary file', [
+                                Log::info('Before saving temporary file', [
                                         'intended_path' => $filePath,
                                         'full_storage_path' => storage_path('app/' . $filePath),
                                         'directory_exists' => is_dir(dirname(storage_path('app/' . $filePath))),
@@ -528,7 +528,7 @@ class PhotoController extends BaseController
                                 $fileExistsAfterSave = $disk->exists($filePath);
                                 $fileSizeAfterSave = $fileExistsAfterSave ? $disk->size($filePath) : 'not_found';
                                 
-                                \Log::info('After saving temporary file', [
+                                Log::info('After saving temporary file', [
                                         'save_result' => $fileExistsAfterSave,
                                         'file_exists_after_save' => $fileExistsAfterSave,
                                         'file_size_after_save' => $fileSizeAfterSave,
@@ -577,7 +577,7 @@ class PhotoController extends BaseController
                 foreach ($files as $file) {
                         if (is_file($file) && ($now - filemtime($file)) >= 3600) {
                                 unlink($file);
-                                \Log::debug('Cleaned old temp file', ['file' => basename($file)]);
+                                Log::debug('Cleaned old temp file', ['file' => basename($file)]);
                         }
                 }
         }
