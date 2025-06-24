@@ -21,6 +21,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\Mime\MimeTypes;
+use Illuminate\Support\Str;
 use Throwable;
 
 class FileSys
@@ -341,16 +342,30 @@ class FileSys
 	 * @param string|null $filename
 	 * @return string|null
 	 */
-	public static function getPathInfoExtension(?string $filename): ?string
-	{
-		if (empty($filename)) return null;
-		if (!str_contains($filename, '.')) return null;
-		
-		$extension = pathinfo($filename, PATHINFO_EXTENSION);
-		$extension = !empty($extension) ? ltrim($extension, '.') : null;
-		
-		return !empty($extension) ? strtolower($extension) : null;
-	}
+
+        public static function getPathInfoExtension(?string $filename): ?string
+        {
+                if (empty($filename)) return null;
+                if (!str_contains($filename, '.')) return null;
+
+                $extension = pathinfo($filename, PATHINFO_EXTENSION);
+                $extension = !empty($extension) ? ltrim($extension, '.') : null;
+
+                return !empty($extension) ? strtolower($extension) : null;
+        }
+
+        /**
+         * Determine if the given path refers to a temporary file.
+         *
+         * @param string $path
+         * @return bool
+         */
+        public static function isTemporaryPath(string $path): bool
+        {
+                $normalizedPath = str_replace('\\', '/', $path);
+
+                return Str::startsWith($normalizedPath, 'temporary/');
+        }
 	
 	// OTHER
 	

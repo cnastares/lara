@@ -18,6 +18,7 @@ use App\Helpers\Common\Arr;
 use App\Helpers\Common\DBUtils;
 use App\Helpers\Common\DotenvEditor;
 use App\Helpers\Common\Files\Storage\StorageDisk;
+use App\Helpers\Common\Files\FileSys;
 use App\Helpers\Services\Localization\Country as CountryHelper;
 use App\Helpers\Services\Localization\Helpers\Country;
 use App\Models\Language;
@@ -2785,9 +2786,7 @@ function isMultiCountriesUrlsEnabled(): bool
  */
 function hasTemporaryPath(string $filePath): bool
 {
-        $normalizedPath = str_replace('\\', '/', $filePath);
-
-        return Str::startsWith($normalizedPath, 'temporary/');
+        return FileSys::isTemporaryPath($filePath);
 }
 
 /**
