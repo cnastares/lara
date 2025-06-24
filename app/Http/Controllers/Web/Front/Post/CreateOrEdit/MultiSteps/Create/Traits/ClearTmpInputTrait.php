@@ -17,6 +17,7 @@
 namespace App\Http\Controllers\Web\Front\Post\CreateOrEdit\MultiSteps\Create\Traits;
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 trait ClearTmpInputTrait
@@ -30,23 +31,18 @@ trait ClearTmpInputTrait
 			session()->forget('postInput');
 		}
 		
-		if (session()->has('picturesInput')) {
-			$picturesInput = (array)session('picturesInput');
-			if (!empty($picturesInput)) {
-                                try {
-                                        $disk = Storage::disk('local');
-                                        foreach ($picturesInput as $filePath) {
-                                                if ($disk->exists($filePath)) {
-                                                        $disk->delete($filePath);
-                                                }
-                                        }
-                                } catch (Throwable $e) {
-                                        $message = $e->getMessage();
-                                        flash($message)->error();
-                                }
-				session()->forget('picturesInput');
-			}
-		}
+                if (session()->has('picturesInput')) {
+                        $picturesInput = (array)session('picturesInput');
+                        if (!empty($picturesInput)) {
+                                // Removal of temporary files is deferred to a scheduled command
+                                // to avoid deleting files that may still be needed.
+                                Log::info('Skipping immediate deletion of temporary files', [
+                                        'files' => $picturesInput,
+                                ]);
+
+                                session()->forget('picturesInput');
+                        }
+                }
 		
 		if (session()->has('paymentInput')) {
 			session()->forget('paymentInput');
