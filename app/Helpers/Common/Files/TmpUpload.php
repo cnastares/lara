@@ -69,7 +69,8 @@ class TmpUpload
                 }
         }
 
-        $disk = StorageDisk::getDisk();
+        // Use the local disk for temporary files
+        $disk = StorageDisk::getDisk('local');
 		
 		try {
 			// Get file's original infos
@@ -147,9 +148,15 @@ class TmpUpload
 			// Get the file path
 			$filePath = $tmpUploadDir . '/' . $filename;
 			
-			// Store the image on disk
-			$disk->put($filePath, $encodedImage->toString());
-			unset($encodedImage);
+        // Store the image on disk
+        $disk->put($filePath, $encodedImage->toString());
+        unset($encodedImage);
+
+        Log::info('Temporary image stored', [
+            'disk'   => 'local',
+            'path'   => $filePath,
+            'exists' => $disk->exists($filePath),
+        ]);
 			
 			// Return the path (to the database later)
 			return $filePath;
@@ -187,7 +194,8 @@ class TmpUpload
 			return null;
 		}
 		
-		$disk = StorageDisk::getDisk();
+        // Use the local disk for temporary files
+        $disk = StorageDisk::getDisk('local');
 		
 		try {
 			// Get file original infos
@@ -201,11 +209,17 @@ class TmpUpload
 			// Get filepath
 			$filePath = $tmpUploadDir . '/' . $filename;
 			
-			// Store the file on disk
-			$disk->put($filePath, File::get($file->getrealpath()));
-			
-			// Return the path (to the database later)
-			return $filePath;
+        // Store the file on disk
+        $disk->put($filePath, File::get($file->getrealpath()));
+
+        Log::info('Temporary file stored', [
+            'disk'   => 'local',
+            'path'   => $filePath,
+            'exists' => $disk->exists($filePath),
+        ]);
+
+        // Return the path (to the database later)
+        return $filePath;
 		} catch (Throwable $e) {
 		}
 		

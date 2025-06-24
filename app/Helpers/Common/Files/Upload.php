@@ -272,11 +272,20 @@ class Upload
 	 */
 	public static function fromPath(string $path, bool $test = true): bool|UploadedFile
 	{
-		if (empty($path) || !Storage::exists($path)) {
-			return false;
-		}
-		
-		$path = Storage::path($path);
+        if (empty($path)) {
+                return false;
+        }
+
+        // Try the local disk first for temporary files
+        if (Storage::disk('local')->exists($path)) {
+                $path = Storage::disk('local')->path($path);
+                Log::info('fromPath using local disk', ['path' => $path]);
+        } elseif (Storage::exists($path)) {
+                $path = Storage::path($path);
+                Log::info('fromPath using default disk', ['path' => $path]);
+        } else {
+                return false;
+        }
 		
 		$filesystem = new Filesystem();
 		$originalName = $filesystem->name($path) . '.' . $filesystem->extension($path);
