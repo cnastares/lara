@@ -376,6 +376,7 @@ class PhotoController extends BaseController
                         'max_file_uploads'    => ini_get('max_file_uploads'),
                         'upload_tmp_dir'      => ini_get('upload_tmp_dir'),
                         'memory_limit'        => ini_get('memory_limit'),
+                        'tmp_dir'             => sys_get_temp_dir(),
                 ]);
 
                 \Log::debug('Upload request received', [
@@ -398,6 +399,8 @@ class PhotoController extends BaseController
                                         'realpath_empty'  => empty($file->getRealPath()),
                                         'is_valid'        => $file->isValid(),
                                         'error_code'      => $file->getError(),
+                                        'file_exists'     => file_exists($file->getPathname()),
+                                        'is_readable'     => is_readable($file->getPathname()),
                                 ];
                         }, is_array($request->file('pictures')) ? $request->file('pictures') : [], array_keys(is_array($request->file('pictures')) ? $request->file('pictures') : []))
                 ]);
@@ -428,9 +431,12 @@ class PhotoController extends BaseController
                                 'index'         => $index,
                                 'original_name' => $file->getClientOriginalName(),
                                 'temp_path'     => $file->getPathname(),
+                                'real_path'     => $file->getRealPath(),
                                 'size'          => $file->getSize(),
                                 'is_valid'      => $file->isValid(),
                                 'error'         => $file->getError(),
+                                'file_exists'   => file_exists($file->getPathname()),
+                                'is_readable'   => is_readable($file->getPathname()),
                         ]);
 
                         if (!$file->isValid()) {
@@ -441,6 +447,27 @@ class PhotoController extends BaseController
                                 ]);
 
                                 return response()->json(['error' => 'Archivo inválido: ' . $file->getErrorMessage()], 422);
+                        }
+
+                        // Verificar que el archivo temporal existe y es legible
+                        $tempPath = $file->getRealPath() ?: $file->getPathname();
+                        if (empty($tempPath) || !file_exists($tempPath)) {
+                                \Log::error('Temporary file not accessible', [
+                                        'file'         => $file->getClientOriginalName(),
+                                        'temp_path'    => $file->getPathname(),
+                                        'real_path'    => $file->getRealPath(),
+                                ]);
+
+                                return response()->json(['error' => 'No se puede acceder al archivo temporal. Intente subir el archivo nuevamente.'], 422);
+                        }
+
+                        if (!is_readable($tempPath)) {
+                                \Log::error('Temporary file not readable', [
+                                        'file'         => $file->getClientOriginalName(),
+                                        'temp_path'    => $tempPath,
+                                ]);
+
+                                return response()->json(['error' => 'No se puede leer el archivo temporal. Intente subir el archivo nuevamente.'], 422);
                         }
 
                         $filePath = TmpUpload::image($file, $this->tmpUploadDir);
@@ -487,6 +514,8 @@ class PhotoController extends BaseController
                         'message' => 'Archivos subidos correctamente',
                         'files'   => $uploadedFiles,
                 ], 200);
+        }
+        
         private function cleanupOldTempFiles()
         {
                 $disk = StorageDisk::getDisk();

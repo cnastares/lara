@@ -39,16 +39,34 @@ class TmpUpload
                 return null;
         }
 
+        // Verificar si el archivo es válido primero
+        if (!$file->isValid()) {
+                Log::warning('Invalid uploaded file', [
+                        'file'       => $file->getClientOriginalName(),
+                        'error_code' => $file->getError(),
+                        'error_message' => $file->getErrorMessage(),
+                ]);
+                return response()->json(['error' => 'Archivo inválido: ' . $file->getErrorMessage()], 422);
+        }
+
+        // En Windows, getRealPath() puede fallar con archivos temporales, pero getPathname() funciona
         $path = $file->getRealPath();
         if (empty($path) || !file_exists($path)) {
-                Log::warning('Temporary file missing', [
-                        'file'       => $file->getClientOriginalName(),
-                        'path'       => (string)$path,
-                        'livewire'   => request()->header('X-Livewire') ? true : false,
-                        'files_count'=> is_countable(request()->file('pictures')) ? count(request()->file('pictures')) : 0,
-                ]);
+                $path = $file->getPathname();
+                
+                // Verificar si el archivo temporal existe usando getPathname()
+                if (empty($path) || !file_exists($path)) {
+                        Log::warning('Temporary file missing', [
+                                'file'       => $file->getClientOriginalName(),
+                                'path'       => (string)$path,
+                                'pathname'   => $file->getPathname(),
+                                'realpath'   => $file->getRealPath(),
+                                'livewire'   => request()->header('X-Livewire') ? true : false,
+                                'files_count'=> is_countable(request()->file('pictures')) ? count(request()->file('pictures')) : 0,
+                        ]);
 
-                return response()->json(['error' => 'El archivo temporal no se encuentra disponible.'], 422);
+                        return response()->json(['error' => 'El archivo temporal no se encuentra disponible. Intente subir el archivo nuevamente.'], 422);
+                }
         }
 
         $disk = StorageDisk::getDisk();
@@ -79,8 +97,17 @@ class TmpUpload
 			$ratio = config('settings.upload.img_resize_ratio', '1');
 			$upsize = config('settings.upload.img_resize_upsize', '0');
 			
-			// Init. Intervention
-			$image = Image::read($file);
+			// Verificar que el archivo es legible antes de procesarlo
+			if (!is_readable($path)) {
+				Log::error('File not readable', [
+					'file' => $file->getClientOriginalName(),
+					'path' => $path,
+				]);
+				return response()->json(['error' => 'No se puede leer el archivo.'], 422);
+			}
+			
+			// Init. Intervention - usar el path directamente en lugar del objeto UploadedFile
+			$image = Image::read($path);
 			
 			// Orient image according to exif data
 			if (isExifExtensionEnabled()) {
@@ -139,10 +166,12 @@ class TmpUpload
                 Log::error('Image upload error', [
                         'message'        => $e->getMessage(),
                         'file'           => $file->getClientOriginalName() ?? null,
+                        'path'           => $path,
                         'input_excerpt'  => $inputExcerpt,
+                        'exception_class'=> get_class($e),
                 ]);
 
-                return response()->json(['error' => 'Imagen no válida.'], 422);
+                return response()->json(['error' => 'Imagen no válida o corrupta. Intente con otra imagen.'], 422);
         }
 	}
 	

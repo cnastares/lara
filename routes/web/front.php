@@ -85,7 +85,7 @@ if (!doesCountriesPageCanBeHomepage()) {
 
 
 // POSTS
-Route::group(function ($router) {
+Route::group([], function ($router) {
 		$router->pattern('id', '[0-9]+');
 		
 		$hidPrefix = config('larapen.core.hashableIdPrefix');
@@ -123,7 +123,7 @@ Route::group(function ($router) {
 			});
 		
 		// MultiSteps Listing creation
-		Route::group(function ($router) {
+		Route::group([], function ($router) {
 				Route::controller(CreatePostController::class)
 					->group(function ($router) {
 						Route::get('posts/create', 'showForm');
@@ -171,7 +171,7 @@ Route::group(function ($router) {
 					});
 				
 				// MultiSteps Listing Edition
-				Route::group(function ($router) {
+				Route::group([], function ($router) {
 						Route::controller(EditPostController::class)
 							->group(function ($router) {
 								Route::get('posts/{id}/details', 'showForm');
@@ -266,7 +266,7 @@ if (!$isDomainmappingAvailable) {
 
 
 // PAGES
-Route::group(function ($router) {
+Route::group([], function ($router) {
 		Route::get(dynamicRoute('routes.pricing'), [PricingController::class, 'index']);
 		Route::get(dynamicRoute('routes.pageBySlug'), [CmsController::class, 'index']);
 		Route::controller(ContactController::class)
@@ -280,7 +280,7 @@ Route::group(function ($router) {
 Route::get(dynamicRoute('routes.sitemap'), SitemapController::class);
 
 // SEARCH
-Route::group(function ($router) {
+Route::group([], function ($router) {
 		$router->pattern('id', '[0-9]+');
 		$router->pattern('username', '[a-zA-Z0-9]+');
 		Route::get(dynamicRoute('routes.search'), [SearchController::class, 'index']);
