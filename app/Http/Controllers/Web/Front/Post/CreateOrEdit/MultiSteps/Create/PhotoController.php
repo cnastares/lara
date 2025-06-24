@@ -157,55 +157,78 @@ class PhotoController extends BaseController
                         }
                 }
 
-                if (!is_array($files) || count($files) === 0) {
-                        Log::warning('postForm called without files', [
-                                'from_ajax' => isFromAjax($request),
-                                'count'     => is_countable($files) ? count($files) : 0,
+                // Si no es AJAX (envío del formulario principal), usar las imágenes temporales guardadas
+                if (!isFromAjax($request)) {
+                        Log::info('Form submission - using saved temporary images', [
+                                'saved_images_count' => count($savedPicturesInput),
+                                'saved_images' => $savedPicturesInput,
                         ]);
-                }
-
-                if (is_array($files) && count($files) > 0) {
-                        foreach ($files as $key => $file) {
-                                if (empty($file)) {
-                                        continue;
-                                }
-
-                                $originalName = $file->getClientOriginalName();
-                                Log::debug('Processing upload', ['name' => $originalName]);
-
-                $filePath = TmpUpload::image($file, $this->tmpUploadDir);
-
-                if ($filePath instanceof JsonResponse) {
-                        return $filePath;
-                }
-
-                if (!is_string($filePath)) {
-                        Log::error('Image upload failed', [
-                                'name' => $originalName,
-                                'type' => gettype($filePath),
-                        ]);
-
-                        return response()->json(['error' => 'Imagen no válida.'], 422);
-                }
-
-                if ($filePath === null) {
-                        Log::error('Image upload failed', ['name' => $originalName]);
+                        
+                        // Si hay imágenes temporales guardadas, usarlas
+                        if (!empty($savedPicturesInput)) {
+                                $picturesInput = $savedPicturesInput;
+                                Log::info('Using saved temporary images for form submission', [
+                                        'count' => count($picturesInput),
+                                        'images' => $picturesInput,
+                                ]);
+                        } else {
+                                Log::warning('postForm called without files', [
+                                        'from_ajax' => isFromAjax($request),
+                                        'count'     => is_countable($files) ? count($files) : 0,
+                                        'saved_images_count' => count($savedPicturesInput),
+                                ]);
+                        }
                 } else {
-                        Log::info('Image uploaded', ['path' => $filePath]);
+                        // Es AJAX - procesar archivos nuevos
+                        if (!is_array($files) || count($files) === 0) {
+                                Log::warning('postForm called without files', [
+                                        'from_ajax' => isFromAjax($request),
+                                        'count'     => is_countable($files) ? count($files) : 0,
+                                ]);
+                        }
 
-                        $picturesInput[] = $filePath;
+                        if (is_array($files) && count($files) > 0) {
+                                foreach ($files as $key => $file) {
+                                        if (empty($file)) {
+                                                continue;
+                                        }
+
+                                        $originalName = $file->getClientOriginalName();
+                                        Log::debug('Processing upload', ['name' => $originalName]);
+
+                                        $filePath = TmpUpload::image($file, $this->tmpUploadDir);
+
+                                        if ($filePath instanceof JsonResponse) {
+                                                return $filePath;
+                                        }
+
+                                        if (!is_string($filePath)) {
+                                                Log::error('Image upload failed', [
+                                                        'name' => $originalName,
+                                                        'type' => gettype($filePath),
+                                                ]);
+
+                                                return response()->json(['error' => 'Imagen no válida.'], 422);
+                                        }
+
+                                        if ($filePath === null) {
+                                                Log::error('Image upload failed', ['name' => $originalName]);
+                                        } else {
+                                                Log::info('Image uploaded', ['path' => $filePath]);
+
+                                                $picturesInput[] = $filePath;
+                                        }
+                                        
+                                        // Check the picture number limit
+                                        if ($key >= ($picturesLimit - 1)) {
+                                                break;
+                                        }
+                                }
+                                
+                                $newPicturesInput = array_merge($savedPicturesInput, $picturesInput);
+                                session()->put('picturesInput', $newPicturesInput);
+                        }
                 }
-				
-				// Check the picture number limit
-				if ($key >= ($picturesLimit - 1)) {
-					break;
-				}
-			}
-			
-			$newPicturesInput = array_merge($savedPicturesInput, $picturesInput);
-			
-			session()->put('picturesInput', $newPicturesInput);
-		}
 		
 		// AJAX response
 		$data = [];
@@ -489,6 +512,29 @@ class PhotoController extends BaseController
                                 \Log::error('Image upload failed', ['name' => $file->getClientOriginalName()]);
                         } else {
                                 \Log::info('Image uploaded', ['path' => $filePath]);
+
+                                // AGREGAR LOG: ANTES de guardar el archivo temporal
+                                \Log::info('Before saving temporary file', [
+                                        'intended_path' => $filePath,
+                                        'full_storage_path' => storage_path('app/' . $filePath),
+                                        'directory_exists' => is_dir(dirname(storage_path('app/' . $filePath))),
+                                        'directory_writable' => is_writable(dirname(storage_path('app/' . $filePath))),
+                                        'file_size' => $file->getSize(),
+                                        'disk_config' => config('filesystems.disks.local'),
+                                ]);
+
+                                // AGREGAR LOG: DESPUÉS de guardar el archivo temporal
+                                $disk = StorageDisk::getDisk();
+                                $fileExistsAfterSave = $disk->exists($filePath);
+                                $fileSizeAfterSave = $fileExistsAfterSave ? $disk->size($filePath) : 'not_found';
+                                
+                                \Log::info('After saving temporary file', [
+                                        'save_result' => $fileExistsAfterSave,
+                                        'file_exists_after_save' => $fileExistsAfterSave,
+                                        'file_size_after_save' => $fileSizeAfterSave,
+                                        'full_path_verification' => file_exists(storage_path('app/' . $filePath)),
+                                        'temporary_directory_contents' => $disk->files(dirname($filePath)),
+                                ]);
 
                                 $picturesInput[] = $filePath;
                                 $uploadedFiles[] = [

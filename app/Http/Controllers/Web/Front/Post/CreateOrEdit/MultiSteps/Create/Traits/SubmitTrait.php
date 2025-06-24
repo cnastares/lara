@@ -24,6 +24,9 @@ use App\Http\Requests\Front\PhotoRequest;
 use App\Http\Requests\Front\PostRequest;
 use App\Models\CategoryField;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 
 trait SubmitTrait
 {
@@ -40,10 +43,53 @@ trait SubmitTrait
 		$picturesInput = (array)session('picturesInput');
 		$paymentInput = (array)session('paymentInput');
 		
+		// AGREGAR LOG: Verificar estructura de la tabla (una sola vez)
+		Log::info('Database table structure verification', [
+			'table_columns' => Schema::getColumnListing('posts'),
+			'image_related_columns' => array_filter(Schema::getColumnListing('posts'), function($column) {
+				return strpos(strtolower($column), 'image') !== false || strpos(strtolower($column), 'photo') !== false || strpos(strtolower($column), 'picture') !== false;
+			})
+		]);
+		
+		// AGREGAR LOG: Verificar configuración de storage
+		Log::info('Storage configuration verification', [
+			'default_disk' => config('filesystems.default'),
+			'local_disk_config' => config('filesystems.disks.local'),
+			'storage_app_path' => storage_path('app'),
+			'storage_app_exists' => is_dir(storage_path('app')),
+			'storage_app_writable' => is_writable(storage_path('app')),
+			'temporary_directory' => storage_path('app/temporary'),
+			'temporary_dir_exists' => is_dir(storage_path('app/temporary')),
+			'temporary_dir_writable' => is_writable(storage_path('app/temporary'))
+		]);
+		
+		// AGREGAR LOG: Verificar tablas relacionadas con imágenes
+		Log::info('Checking related image tables', [
+			'pictures_table_exists' => Schema::hasTable('pictures'),
+			'post_pictures_table_exists' => Schema::hasTable('post_pictures'),
+			'uploads_table_exists' => Schema::hasTable('uploads'),
+			'files_table_exists' => Schema::hasTable('files')
+		]);
+		
+		if (Schema::hasTable('pictures')) {
+			Log::info('Pictures table structure', [
+				'pictures_columns' => Schema::getColumnListing('pictures')
+			]);
+		}
+		
+		// AGREGAR LOG: Estado inicial de los datos
+		\Log::info('Starting storeInputDataInDatabase', [
+			'post_input_count' => count($postInput),
+			'pictures_input_count' => count($picturesInput),
+			'pictures_input' => $picturesInput,
+			'payment_input_count' => count($paymentInput),
+		]);
+		
 		if (empty($postInput)) {
 			$postStep = $this->getStepByKey(PostController::class);
 			$postStepUrl = $this->getNextStepUrl($postStep);
 			
+			\Log::warning('No post input found, redirecting to post step');
 			return redirect()->to($postStepUrl);
 		}
 		
@@ -65,17 +111,108 @@ trait SubmitTrait
 			}
 		}
 		
+		// AGREGAR LOG: ANTES de procesar las imágenes
+		\Log::info('Starting image processing in storeInputDataInDatabase', [
+			'pictures_input_count' => count($picturesInput ?? []),
+			'pictures_input' => $picturesInput ?? [],
+		]);
+		
 		$inputArray['pictures'] = [];
 		if (!empty($picturesInput)) {
-			foreach ($picturesInput as $filePath) {
+			foreach ($picturesInput as $index => $filePath) {
+				// AGREGAR LOG: DURANTE el procesamiento de cada imagen
+				Log::info('Processing individual image', [
+					'index' => $index,
+					'temp_path' => $filePath,
+					'temp_file_exists' => Storage::disk('local')->exists($filePath),
+					'temp_file_size' => Storage::disk('local')->exists($filePath) ? Storage::disk('local')->size($filePath) : 'file_not_found',
+					'has_temporary_path' => hasTemporaryPath($filePath),
+				]);
+				
+				// AGREGAR LOG: Análisis de timing
+				Log::info('Timing analysis', [
+					'current_time' => now(),
+					'temp_file_path' => $filePath,
+					'temp_file_exists' => Storage::disk('local')->exists($filePath),
+					'temp_directory_contents' => Storage::disk('local')->files('temporary'),
+					'all_temporary_files' => Storage::disk('local')->allFiles('temporary')
+				]);
+				
+				if (!Storage::disk('local')->exists($filePath)) {
+					// NUEVO: Intentar recuperar de otras ubicaciones
+					Log::warning('Temporary file not found, attempting recovery', [
+						'original_path' => $filePath,
+						'attempting_alternatives' => true
+					]);
+					
+					// Intentar encontrar en todas las ubicaciones posibles
+					$allTempFiles = Storage::disk('local')->allFiles('temporary');
+					$possibleMatches = array_filter($allTempFiles, function($file) use ($filePath) {
+						return basename($file) === basename($filePath);
+					});
+					
+					Log::info('Recovery attempt results', [
+						'all_temp_files' => $allTempFiles,
+						'possible_matches' => $possibleMatches,
+						'recovery_successful' => !empty($possibleMatches)
+					]);
+					
+					if (!empty($possibleMatches)) {
+						$filePath = $possibleMatches[0]; // Usar el primer match
+						Log::info('Using recovered file', ['recovered_path' => $filePath]);
+					} else {
+						Log::error('Unable to recover temporary file', [
+							'original_path' => $filePath,
+							'available_files' => $allTempFiles
+						]);
+						continue; // Saltar esta imagen
+					}
+				}
+				
 				if (!empty($filePath)) {
 					if (hasTemporaryPath($filePath)) {
-						$uploadedFile = Upload::fromPath($filePath);
-						$inputArray['pictures'][] = $uploadedFile;
+						try {
+							$uploadedFile = Upload::fromPath($filePath);
+							$inputArray['pictures'][] = $uploadedFile;
+							
+							Log::info('Successfully created Upload object from path', [
+								'index' => $index,
+								'original_path' => $filePath,
+								'upload_object_type' => get_class($uploadedFile),
+								'upload_object_valid' => $uploadedFile->isValid(),
+							]);
+						} catch (\Exception $e) {
+							Log::error('Error creating Upload object from path', [
+								'index' => $index,
+								'path' => $filePath,
+								'error' => $e->getMessage(),
+								'file' => $e->getFile(),
+								'line' => $e->getLine(),
+							]);
+						}
+					} else {
+						Log::warning('File path is not recognized as temporary', [
+							'index' => $index,
+							'path' => $filePath,
+						]);
 					}
 				}
 			}
 		}
+		
+		// AGREGAR LOG: DESPUÉS de procesar todas las imágenes
+		\Log::info('Completed image processing', [
+			'final_pictures_count' => count($inputArray['pictures']),
+			'final_pictures_array' => array_map(function($file) {
+				return [
+					'type' => get_class($file),
+					'original_name' => $file->getClientOriginalName(),
+					'is_valid' => $file->isValid(),
+					'size' => $file->getSize(),
+				];
+			}, $inputArray['pictures']),
+		]);
+		
 		$inputArray = array_merge($inputArray, $paymentInput);
 		
 		$request->merge($inputArray);
@@ -86,11 +223,43 @@ trait SubmitTrait
 		if (!empty($uploadedPictures)) {
 			if (is_array($uploadedPictures)) {
 				$request->files->set('pictures', $uploadedPictures);
+				
+				\Log::info('Set pictures in request files', [
+					'pictures_count' => count($uploadedPictures),
+					'request_has_pictures' => $request->hasFile('pictures'),
+					'request_files_count' => count($request->allFiles()),
+				]);
 			}
 		}
 		
+		// AGREGAR LOG: ANTES de guardar en BD
+		\Log::info('About to call postService->store', [
+			'request_has_pictures' => $request->hasFile('pictures'),
+			'request_files_count' => count($request->allFiles()),
+			'input_array_keys' => array_keys($inputArray),
+		]);
+		
 		// Store the post
-		$data = getServiceData($this->postService->store($request));
+		try {
+			$data = getServiceData($this->postService->store($request));
+			
+			// AGREGAR LOG: DESPUÉS de guardar en BD
+			\Log::info('Post service store completed', [
+				'success' => data_get($data, 'success'),
+				'post_id' => data_get($data, 'result.id'),
+				'message' => data_get($data, 'message'),
+				'result_keys' => array_keys(data_get($data, 'result', [])),
+			]);
+			
+		} catch (\Exception $e) {
+			\Log::error('Error in postService->store', [
+				'error_message' => $e->getMessage(),
+				'error_file' => $e->getFile(),
+				'error_line' => $e->getLine(),
+				'pictures_input' => $picturesInput ?? [],
+			]);
+			throw $e;
+		}
 		
 		// dd($data);
 		
@@ -111,9 +280,19 @@ trait SubmitTrait
 			
 			// Clear Temporary Inputs & Files
 			$this->clearTemporaryInput();
+			
+			\Log::info('Post created successfully', [
+				'post_id' => $postId,
+				'message' => $message,
+			]);
 		} else {
 			$message = $message ?? t('unknown_error');
 			flash($message)->error();
+			
+			\Log::error('Post creation failed', [
+				'message' => $message,
+				'data' => $data,
+			]);
 			
 			$previousUrl = data_get($data, 'extra.previousUrl');
 			if (!empty($previousUrl)) {
@@ -127,6 +306,14 @@ trait SubmitTrait
 		$post = data_get($data, 'result');
 		
 		abort_if(empty($post), 404, t('post_not_found'));
+		
+		// AGREGAR LOG: Verificar el post creado
+		\Log::info('Post resource retrieved', [
+			'post_id' => data_get($post, 'id'),
+			'post_attributes' => array_keys(data_get($post, 'attributes', [])),
+			'post_has_pictures' => isset($post['pictures']),
+			'post_pictures_count' => isset($post['pictures']) ? count($post['pictures']) : 0,
+		]);
 		
 		// Get the next URL
 		$nextStep = $this->getStepByKey(FinishController::class);
@@ -195,6 +382,11 @@ trait SubmitTrait
 				flash($mailMessage)->error();
 			}
 		}
+		
+		\Log::info('storeInputDataInDatabase completed successfully', [
+			'post_id' => $postId,
+			'next_url' => $nextUrl,
+		]);
 		
 		return redirect()->to($nextUrl);
 	}
