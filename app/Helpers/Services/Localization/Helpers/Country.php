@@ -32,7 +32,7 @@ class Country
 	 * @var array
 	 * Available data sources.
 	 */
-	protected $dataSources = ['icu', 'icu'];
+        protected $dataSources = ['icu', 'cldr'];
 	
 	/**
 	 * The name of the country list file
@@ -135,13 +135,14 @@ class Country
 			$locale = config('app.locale');
 		}
 		
-		$source = (!empty($source)) ? mb_strtolower($source) . '/' : '';
-		
-		if (!empty($source) && !in_array($source, $this->dataSources)) {
-			return [];
-		}
-		
-		$file = $this->dataDir . '/' . $source . $locale . '/' . $this->filename;
+                $source = (!empty($source)) ? mb_strtolower($source) : '';
+
+                if (!empty($source) && !in_array($source, $this->dataSources)) {
+                        return [];
+                }
+
+                $sourceDir = ($source === 'icu') ? $source . '/' : '';
+                $file = $this->dataDir . '/' . $sourceDir . $locale . '/' . $this->filename;
 		if (!file_exists($file)) {
 			return [];
 		}
