@@ -32,6 +32,7 @@ use Hashids\Hashids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Number;
+use Illuminate\Support\Str;
 use Intervention\Image\Laravel\Facades\Image as FacadeImage;
 use Larapen\LaravelDistance\Helper;
 use Larapen\TextToImage\Facades\TextToImage;
@@ -2784,7 +2785,9 @@ function isMultiCountriesUrlsEnabled(): bool
  */
 function hasTemporaryPath(string $filePath): bool
 {
-	return str_starts_with($filePath, 'temporary' . DIRECTORY_SEPARATOR);
+        $normalizedPath = str_replace('\\', '/', $filePath);
+
+        return Str::startsWith($normalizedPath, 'temporary/');
 }
 
 /**
