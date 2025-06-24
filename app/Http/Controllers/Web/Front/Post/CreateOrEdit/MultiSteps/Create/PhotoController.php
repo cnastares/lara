@@ -524,7 +524,8 @@ class PhotoController extends BaseController
                                 ]);
 
                                 // AGREGAR LOG: DESPUÉS de guardar el archivo temporal
-                                $disk = StorageDisk::getDisk();
+                                // Use local disk for temporary files
+                                $disk = StorageDisk::getDisk('local');
                                 $fileExistsAfterSave = $disk->exists($filePath);
                                 $fileSizeAfterSave = $fileExistsAfterSave ? $disk->size($filePath) : 'not_found';
                                 
@@ -532,7 +533,7 @@ class PhotoController extends BaseController
                                         'save_result' => $fileExistsAfterSave,
                                         'file_exists_after_save' => $fileExistsAfterSave,
                                         'file_size_after_save' => $fileSizeAfterSave,
-                                        'full_path_verification' => file_exists(storage_path('app/' . $filePath)),
+                                        'full_path_verification' => Storage::disk('local')->exists($filePath),
                                         'temporary_directory_contents' => $disk->files(dirname($filePath)),
                                 ]);
 
@@ -564,7 +565,8 @@ class PhotoController extends BaseController
         
         private function cleanupOldTempFiles()
         {
-                $disk = StorageDisk::getDisk();
+                // Use local disk to clean temporary files
+                $disk = StorageDisk::getDisk('local');
                 $tempDir = $disk->path('temporary');
 
                 if (!is_dir($tempDir)) {

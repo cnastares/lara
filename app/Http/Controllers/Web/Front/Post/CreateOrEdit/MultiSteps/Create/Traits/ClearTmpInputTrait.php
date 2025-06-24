@@ -16,6 +16,7 @@
 
 namespace App\Http\Controllers\Web\Front\Post\CreateOrEdit\MultiSteps\Create\Traits;
 
+use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 trait ClearTmpInputTrait
@@ -32,14 +33,17 @@ trait ClearTmpInputTrait
 		if (session()->has('picturesInput')) {
 			$picturesInput = (array)session('picturesInput');
 			if (!empty($picturesInput)) {
-				try {
-					foreach ($picturesInput as $filePath) {
-						$this->removePictureWithItsThumbs($filePath);
-					}
-				} catch (Throwable $e) {
-					$message = $e->getMessage();
-					flash($message)->error();
-				}
+                                try {
+                                        $disk = Storage::disk('local');
+                                        foreach ($picturesInput as $filePath) {
+                                                if ($disk->exists($filePath)) {
+                                                        $disk->delete($filePath);
+                                                }
+                                        }
+                                } catch (Throwable $e) {
+                                        $message = $e->getMessage();
+                                        flash($message)->error();
+                                }
 				session()->forget('picturesInput');
 			}
 		}

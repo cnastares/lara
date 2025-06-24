@@ -22,7 +22,7 @@ class CleanTempFiles extends Command
 
     public function handle(): void
     {
-        $tempPath = storage_path('app/temp');
+        $tempPath = storage_path('app/temporary');
         $files = glob($tempPath . '/*');
         $now = time();
 
