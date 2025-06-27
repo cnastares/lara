@@ -295,11 +295,16 @@ Route::prefix('pictures')
 		Route::post('reorder', 'reorder')->name('pictures.reorder'); // Bulk Update
 	});
 Route::prefix('posts')
-	->controller(PictureController::class)
-	->group(function ($router) {
-		$router->pattern('postId', '[0-9]+');
-		Route::get('{postId}/pictures', 'index')->name('posts.pictures');
-	});
+        ->controller(PictureController::class)
+        ->group(function ($router) {
+                $router->pattern('postId', '[0-9]+');
+                Route::get('{postId}/pictures', 'index')->name('posts.pictures');
+        });
+
+// uploads
+Route::post('uploads', [\App\Http\Controllers\Api\UploadController::class, 'store'])
+        ->middleware('upload.validation')
+        ->name('uploads.store');
 
 // packages (promotion|subscription)
 Route::prefix('packages')

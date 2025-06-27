@@ -119,11 +119,19 @@ return [
 			'replace_placeholders' => true,
 		],
 		
-		'errorlog' => [
-			'driver' => 'errorlog',
-			'level'  => env('LOG_LEVEL', 'debug'),
-			'replace_placeholders' => true,
-		],
+                'errorlog' => [
+                        'driver' => 'errorlog',
+                        'level'  => env('LOG_LEVEL', 'debug'),
+                        'replace_placeholders' => true,
+                ],
+
+                'upload' => [
+                        'driver' => 'custom',
+                        'via'    => App\Logging\CreateSizeRotatingLogger::class,
+                        'path'   => storage_path('logs/upload.log'),
+                        'level'  => env('LOG_LEVEL', 'info'),
+                        'max_bytes' => 5 * 1024 * 1024,
+                ],
 		
 		'null' => [
 			'driver'  => 'monolog',
