@@ -23,6 +23,7 @@ use App\Http\Controllers\Web\Admin\Panel\PanelController;
 use App\Http\Requests\Admin\Request;
 use App\Http\Requests\Admin\UserRequest as StoreRequest;
 use App\Http\Requests\Admin\UserRequest as UpdateRequest;
+use App\Http\Traits\LogsActivity;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\Scopes\VerifiedScope;
@@ -36,6 +37,8 @@ use Throwable;
 
 class UserController extends PanelController
 {
+	use LogsActivity;
+	
 	public function setup()
 	{
 		$authUser = auth()->user();
@@ -793,29 +796,79 @@ class UserController extends PanelController
 	
 	public function store(StoreRequest $request): RedirectResponse
 	{
-		$request = $this->handleInput($request);
+		$inputData = $request->only(['name', 'email', 'phone', 'username', 'auth_field', 'country_code']);
+		$this->logRequestStart('admin.user.store', $inputData, 'admin');
 		
-		return parent::storeCrud($request);
+		try {
+			$request = $this->handleInput($request);
+			
+			$result = $this->withPerformanceLog('admin.user.store', function() use ($request) {
+				return parent::storeCrud($request);
+			}, 'admin');
+			
+			$this->logSuccess('admin.user.store', [
+				'created_user_email' => $request->input('email'),
+				'created_user_name' => $request->input('name'),
+				'created_user_phone' => $request->input('phone'),
+			], 'admin');
+			
+			$this->logModelOperation('created', 'User', null, [
+				'email' => $request->input('email'),
+				'name' => $request->input('name'),
+			], 'admin');
+			
+			return $result;
+		} catch (Throwable $e) {
+			$this->logException('admin.user.store', $e, $inputData, 'admin');
+			throw $e;
+		}
 	}
 	
 	public function update(UpdateRequest $request): RedirectResponse
 	{
-		$request = $this->handleInput($request);
-		$request = $this->uploadPhoto($request);
+		$userId = $request->segment(3);
+		$inputData = $request->only(['name', 'email', 'phone', 'username', 'auth_field', 'country_code']);
+		$this->logRequestStart('admin.user.update', array_merge($inputData, ['user_id' => $userId]), 'admin');
 		
-		$authUser = auth()->user();
-		
-		// Is the admin user's own account?
-		// If from self account form?
-		$isTheAdminOwnAccount = ($authUser->getAuthIdentifier() == $request->segment(3));
-		$isFromSelfAccountForm = str_contains(url()->previous(), urlGen()->adminUri('account'));
-		
-		// Prevent user's role removal
-		if ($isTheAdminOwnAccount || $isFromSelfAccountForm) {
-			$this->xPanel->disableSyncPivot();
+		try {
+			$request = $this->handleInput($request);
+			$request = $this->uploadPhoto($request);
+			
+			$authUser = auth()->user();
+			
+			// Is the admin user's own account?
+			// If from self account form?
+			$isTheAdminOwnAccount = ($authUser->getAuthIdentifier() == $userId);
+			$isFromSelfAccountForm = str_contains(url()->previous(), urlGen()->adminUri('account'));
+			
+			// Prevent user's role removal
+			if ($isTheAdminOwnAccount || $isFromSelfAccountForm) {
+				$this->xPanel->disableSyncPivot();
+			}
+			
+			$result = $this->withPerformanceLog('admin.user.update', function() use ($request) {
+				return parent::updateCrud($request);
+			}, 'admin');
+			
+			$this->logSuccess('admin.user.update', [
+				'updated_user_id' => $userId,
+				'updated_user_email' => $request->input('email'),
+				'updated_user_name' => $request->input('name'),
+				'is_self_update' => $isTheAdminOwnAccount,
+				'is_from_account_form' => $isFromSelfAccountForm,
+			], 'admin');
+			
+			$this->logModelOperation('updated', 'User', $userId, [
+				'email' => $request->input('email'),
+				'name' => $request->input('name'),
+				'is_self_update' => $isTheAdminOwnAccount,
+			], 'admin');
+			
+			return $result;
+		} catch (Throwable $e) {
+			$this->logException('admin.user.update', $e, array_merge($inputData, ['user_id' => $userId]), 'admin');
+			throw $e;
 		}
-		
-		return parent::updateCrud($request);
 	}
 	
 	// PRIVATE METHODS

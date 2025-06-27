@@ -26,6 +26,7 @@ use App\Services\Auth\TwoFactorService;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @group Users
@@ -93,7 +94,12 @@ class UserController extends BaseController
 	 */
 	public function store(UserRequest $request): JsonResponse
 	{
-		return $this->userService->store($request);
+		$result = $this->userService->store($request);
+		Log::info('API User registered', [
+			'ip' => $request->ip(),
+			'request_id' => $this->requestId,
+		]);
+		return $this->jsonWithRequestId($result->getData(true), $result->getStatusCode());
 	}
 	
 	/**
@@ -113,8 +119,8 @@ class UserController extends BaseController
 		$params = [
 			'embed' => request()->input('embed'),
 		];
-		
-		return $this->userService->getEntry($id, $params);
+		$result = $this->userService->getEntry($id, $params);
+		return $this->jsonWithRequestId($result->getData(true), $result->getStatusCode());
 	}
 	
 	/**

@@ -126,4 +126,8 @@ echo "[timestamp] Temporary file not found, attempting recovery"
 echo "[timestamp] Recovery attempt results"
 echo "[timestamp] Using recovered file"
 echo ""
-echo "Si el archivo temporal se pierde, el sistema intentará recuperarlo." 
+echo "Si el archivo temporal se pierde, el sistema intentará recuperarlo."
+
+mkdir tests/Feature
+
+php artisan test --env=testing 

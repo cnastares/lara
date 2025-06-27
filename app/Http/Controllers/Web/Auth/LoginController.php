@@ -27,6 +27,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Log;
 use Larapen\LaravelMetaTags\Facades\MetaTag;
+use Illuminate\Support\Str;
 
 class LoginController extends FrontController
 {
@@ -86,7 +87,7 @@ class LoginController extends FrontController
 	public function showLoginForm(): View|RedirectResponse
 	{
 		// Remembering Login
-		if (auth()->viaRemember()) {
+		if (function_exists('auth') && auth()->viaRemember()) {
 			return redirect()->intended($this->redirectTo);
 		}
 		
@@ -129,59 +130,60 @@ class LoginController extends FrontController
 	 */
 	public function login(LoginRequest $request): RedirectResponse
 	{
+		// Generar o recuperar request-id
+		$requestId = $request->header('X-Request-Id') ?? Str::uuid()->toString();
 		// Log-in the user
 		$data = getServiceData($this->loginService->login($request));
-		
 		// Parsing the API response
 		$message = data_get($data, 'message');
 		$success = data_get($data, 'success');
-		
 		// Two-Factor Authentication Challenge Checking
 		$user = data_get($data, 'result');
 		$isTwoFactorEnabled = (isTwoFactorEnabled() && data_get($user, 'two_factor_enabled', false));
 		if ($isTwoFactorEnabled) {
 			$isTwoFactorSendCodeFailed = (data_get($data, 'extra.sendCodeFailed') === true);
 			if ($isTwoFactorSendCodeFailed) {
-				// Remove temporary session key
 				session()->forget('twoFactorUserId');
-				
-				// Mark 2FA as completed
 				session()->put('twoFactorAuthenticated', true);
 			} else {
-				// Get the 2FA data
 				$userId = data_get($user, 'id');
 				$twoFactorSuccess = data_get($data, 'extra.twoFactorSuccess');
 				$twoFactorChallengeRequired = data_get($data, 'extra.twoFactorChallengeRequired');
 				$isTwoFactorChallengeRequired = ($success === false && $twoFactorChallengeRequired === true);
 				$twoFactorMethodValue = data_get($data, 'extra.twoFactorMethodValue');
-				
-				// Check the 2FA challenge
 				if ($isTwoFactorChallengeRequired && !empty($userId) && !empty($twoFactorMethodValue)) {
 					session()->put('twoFactorUserId', $userId);
 					session()->put('twoFactorMethodValue', $twoFactorMethodValue);
-					
 					if ($twoFactorSuccess) {
 						flash($message)->success();
 					} else {
 						flash($message)->error();
 					}
-					
 					return redirect()->to(urlGen()->twoFactorChallenge());
 				}
 			}
 		}
-		
-                if ($success) {
-                        Log::info('User logged in', [
-                                'user_id' => auth()->id(),
-                                'ip' => $request->ip(),
-                        ]);
-
-                        return $this->createNewSession($data);
-                }
-		
+		if ($success) {
+			$userId = null;
+			if (function_exists('auth')) {
+				$user = auth()->user();
+				$userId = $user ? $user->getAuthIdentifier() : null;
+			}
+			Log::info('User logged in', [
+				'user_id' => $userId,
+				'ip' => $request->ip(),
+				'request_id' => $requestId,
+			]);
+			return $this->createNewSession($data);
+		}
+		// Loguear error de login
+		Log::warning('User login failed', [
+			'ip' => $request->ip(),
+			'request_id' => $requestId,
+			'message' => $message,
+			'input' => $request->except(['password']),
+		]);
 		$message = $message ?? trans('auth.failed');
-		
 		return redirect()->to($this->loginUrl)->withErrors(['error' => $message])->withInput();
 	}
 	

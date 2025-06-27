@@ -51,4 +51,63 @@
 # CUSTOM APACHE RULES
 # ===================
 
+# CORS Headers para fuentes web - Fix para errores CORS
+<IfModule mod_headers.c>
+    # Permitir CORS para todos los archivos de fuentes
+    <FilesMatch "\.(ttf|ttc|otf|eot|woff|woff2|font\.css)$">
+        Header set Access-Control-Allow-Origin "*"
+        Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+        Header set Access-Control-Allow-Headers "Content-Type"
+    </FilesMatch>
+    
+    # Headers específicos para archivos de fuentes con cache optimizado
+    <FilesMatch "\.(woff|woff2)$">
+        Header set Cache-Control "public, max-age=31536000"
+        Header append Vary Accept-Encoding
+    </FilesMatch>
+    
+    # Headers para archivos CSS
+    <FilesMatch "\.css$">
+        Header set Access-Control-Allow-Origin "*"
+    </FilesMatch>
+</IfModule>
+
+# MIME Types para fuentes web
+<IfModule mod_mime.c>
+    AddType application/font-woff .woff
+    AddType application/font-woff2 .woff2
+    AddType application/vnd.ms-fontobject .eot
+    AddType application/x-font-ttf .ttf
+    AddType application/x-font-opentype .otf
+    AddType image/svg+xml .svg
+</IfModule>
+
+# Compresión para fuentes
+<IfModule mod_deflate.c>
+    # Comprimir fuentes que lo soporten
+    AddOutputFilterByType DEFLATE application/font-woff
+    AddOutputFilterByType DEFLATE application/x-font-ttf
+    AddOutputFilterByType DEFLATE application/x-font-opentype
+    AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# Cache para fuentes y recursos estáticos
+<IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # Fuentes web - cache largo (1 año)
+    ExpiresByType application/font-woff "access plus 1 year"
+    ExpiresByType application/font-woff2 "access plus 1 year"
+    ExpiresByType application/vnd.ms-fontobject "access plus 1 year"
+    ExpiresByType application/x-font-ttf "access plus 1 year"
+    ExpiresByType application/x-font-opentype "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    
+    # CSS - cache medio (1 mes)
+    ExpiresByType text/css "access plus 1 month"
+    
+    # JavaScript - cache medio (1 mes)
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType text/javascript "access plus 1 month"
+</IfModule>
 

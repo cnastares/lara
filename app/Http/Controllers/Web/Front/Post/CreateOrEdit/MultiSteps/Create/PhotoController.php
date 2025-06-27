@@ -91,6 +91,7 @@ class PhotoController extends BaseController
 	 */
 	public function postForm(PhotoRequest $request): JsonResponse|RedirectResponse
 	{
+		$requestId = $request->header('X-Request-Id') ?? Str::uuid()->toString();
 		if (!isFromAjax($request)) {
 			// Return to the last unlocked step if the current step remains locked
 			$currentStep = $this->getStepByKey(get_class($this));
@@ -162,6 +163,7 @@ class PhotoController extends BaseController
                         Log::info('Form submission - using saved temporary images', [
                                 'saved_images_count' => count($savedPicturesInput),
                                 'saved_images' => $savedPicturesInput,
+                                'request_id' => $requestId,
                         ]);
                         
                         // Si hay imágenes temporales guardadas, usarlas
@@ -170,12 +172,14 @@ class PhotoController extends BaseController
                                 Log::info('Using saved temporary images for form submission', [
                                         'count' => count($picturesInput),
                                         'images' => $picturesInput,
+                                        'request_id' => $requestId,
                                 ]);
                         } else {
                                 Log::warning('postForm called without files', [
                                         'from_ajax' => isFromAjax($request),
                                         'count'     => is_countable($files) ? count($files) : 0,
                                         'saved_images_count' => count($savedPicturesInput),
+                                        'request_id' => $requestId,
                                 ]);
                         }
                 } else {
@@ -216,7 +220,11 @@ class PhotoController extends BaseController
                                         } else {
                                                 Log::info('Image uploaded', ['path' => $filePath]);
 
-                                                $picturesInput[] = $filePath;
+                                                $existing = session('picturesInput', []);
+                                                if (!in_array($filePath, $existing)) {
+                                                        $existing[] = $filePath;
+                                                        session(['picturesInput' => $existing]);
+                                                }
                                         }
                                         
                                         // Check the picture number limit
@@ -224,9 +232,6 @@ class PhotoController extends BaseController
                                                 break;
                                         }
                                 }
-                                
-                                $newPicturesInput = array_merge($savedPicturesInput, $picturesInput);
-                                session()->put('picturesInput', $newPicturesInput);
                         }
                 }
 		
@@ -393,22 +398,20 @@ class PhotoController extends BaseController
 
         public function uploadPhotos(Request $request): JsonResponse
         {
-                Log::debug('PHP Upload Configuration', [
-                        'upload_max_filesize' => ini_get('upload_max_filesize'),
-                        'post_max_size'       => ini_get('post_max_size'),
-                        'max_file_uploads'    => ini_get('max_file_uploads'),
-                        'upload_tmp_dir'      => ini_get('upload_tmp_dir'),
-                        'memory_limit'        => ini_get('memory_limit'),
-                        'tmp_dir'             => sys_get_temp_dir(),
-                ]);
-
+                $requestId = $request->header('X-Request-Id') ?? Str::uuid()->toString();
+                $sessionId = session()->getId();
+                
+                // Log de configuración PHP solo una vez por request
                 Log::debug('Upload request received', [
+                        'request_id'   => $requestId,
+                        'session_id'   => $sessionId,
                         'files_count'  => count($request->allFiles()),
                         'has_pictures' => $request->hasFile('pictures'),
                         'request_data' => $request->except(['_token', 'pictures'])
                 ]);
 
                 Log::debug('Detailed file analysis', [
+                        'request_id'  => $requestId,
                         'total_files' => is_countable($request->file('pictures')) ? count($request->file('pictures')) : 0,
                         'file_details' => array_map(function ($file, $index) {
                                 return [
@@ -449,10 +452,31 @@ class PhotoController extends BaseController
                 $countExistingPictures = count($savedPicturesInput);
                 $picturesLimit = $defaultPicturesLimit - $countExistingPictures;
 
+                // Cache para evitar duplicados por nombre de archivo y tamaño
+                $uploadedFileCache = [];
+                foreach ($savedPicturesInput as $existingFile) {
+                        $fileName = basename($existingFile);
+                        $uploadedFileCache[$fileName] = true;
+                }
+
                 foreach ($request->file('pictures') as $index => $file) {
+                        // Verificar duplicados antes de procesar
+                        $originalName = $file->getClientOriginalName();
+                        $fileKey = $originalName . '_' . $file->getSize();
+                        
+                        if (isset($uploadedFileCache[$fileKey])) {
+                                Log::info('Duplicate file detected, skipping', [
+                                        'request_id' => $requestId,
+                                        'file' => $originalName,
+                                        'size' => $file->getSize()
+                                ]);
+                                continue;
+                        }
+                        
                         Log::debug('Processing file', [
+                                'request_id'    => $requestId,
                                 'index'         => $index,
-                                'original_name' => $file->getClientOriginalName(),
+                                'original_name' => $originalName,
                                 'temp_path'     => $file->getPathname(),
                                 'real_path'     => $file->getRealPath(),
                                 'size'          => $file->getSize(),
@@ -509,37 +533,38 @@ class PhotoController extends BaseController
                         }
 
                         if ($filePath === null) {
-                                Log::error('Image upload failed', ['name' => $file->getClientOriginalName()]);
+                                Log::error('Image upload failed', [
+                                        'request_id' => $requestId,
+                                        'name' => $originalName
+                                ]);
                         } else {
-                                Log::info('Image uploaded', ['path' => $filePath]);
-
-                                // AGREGAR LOG: ANTES de guardar el archivo temporal
-                                Log::info('Before saving temporary file', [
-                                        'intended_path' => $filePath,
-                                        'full_storage_path' => storage_path('app/' . $filePath),
-                                        'directory_exists' => is_dir(dirname(storage_path('app/' . $filePath))),
-                                        'directory_writable' => is_writable(dirname(storage_path('app/' . $filePath))),
-                                        'file_size' => $file->getSize(),
-                                        'disk_config' => config('filesystems.disks.local'),
+                                Log::info('Image uploaded', [
+                                        'request_id' => $requestId,
+                                        'path' => $filePath
                                 ]);
 
-                                // AGREGAR LOG: DESPUÉS de guardar el archivo temporal
-                                // Use local disk for temporary files
+                                // Marcar archivo como procesado para evitar duplicados
+                                $uploadedFileCache[$fileKey] = true;
+
+                                // Verificar que el archivo se guardó correctamente
                                 $disk = StorageDisk::getDisk('local');
                                 $fileExistsAfterSave = $disk->exists($filePath);
-                                $fileSizeAfterSave = $fileExistsAfterSave ? $disk->size($filePath) : 'not_found';
                                 
-                                Log::info('After saving temporary file', [
-                                        'save_result' => $fileExistsAfterSave,
-                                        'file_exists_after_save' => $fileExistsAfterSave,
-                                        'file_size_after_save' => $fileSizeAfterSave,
-                                        'full_path_verification' => Storage::disk('local')->exists($filePath),
-                                        'temporary_directory_contents' => $disk->files(dirname($filePath)),
-                                ]);
+                                if (!$fileExistsAfterSave) {
+                                        Log::error('File not saved properly', [
+                                                'request_id' => $requestId,
+                                                'intended_path' => $filePath
+                                        ]);
+                                        return response()->json(['error' => 'No se pudo guardar el archivo temporal.'], 500);
+                                }
 
-                                $picturesInput[] = $filePath;
+                                $existing = session('picturesInput', []);
+                                if (!in_array($filePath, $existing)) {
+                                        $existing[] = $filePath;
+                                        session(['picturesInput' => $existing]);
+                                }
                                 $uploadedFiles[] = [
-                                        'original_name' => $file->getClientOriginalName(),
+                                        'original_name' => $originalName,
                                         'temp_name'     => basename($filePath),
                                         'temp_path'     => $filePath,
                                         'size'          => $file->getSize(),
@@ -566,24 +591,37 @@ class PhotoController extends BaseController
         
         private function cleanupOldTempFiles()
         {
-                // Kept for reference. Actual deletion should be handled by a
-                // scheduled command to avoid removing files before they are
-                // processed.
-
-                $disk = StorageDisk::getDisk('local');
-                $tempDir = $disk->path('temporary');
-
-                if (!is_dir($tempDir)) {
-                        return;
-                }
-
-                $files = glob($tempDir . '/*');
-                $now = time();
-
-                foreach ($files as $file) {
-                        if (is_file($file) && ($now - filemtime($file)) >= 3600) {
-                                Log::debug('Old temp file detected', ['file' => basename($file)]);
+                try {
+                        $disk = StorageDisk::getDisk('local');
+                        
+                        // Limpiar archivos temporales de más de 1 hora de antigüedad
+                        $tempDirectories = $disk->directories('temporary');
+                        $now = time();
+                        $cleanupCount = 0;
+                        
+                        foreach ($tempDirectories as $dir) {
+                                $files = $disk->files($dir);
+                                foreach ($files as $file) {
+                                        $lastModified = $disk->lastModified($file);
+                                        if (($now - $lastModified) >= 3600) { // 1 hora
+                                                $disk->delete($file);
+                                                $cleanupCount++;
+                                        }
+                                }
+                                
+                                // Si el directorio está vacío, eliminarlo también
+                                if (empty($disk->files($dir))) {
+                                        $disk->deleteDirectory($dir);
+                                }
                         }
+                        
+                        if ($cleanupCount > 0) {
+                                Log::info('Temporary files cleaned up', ['count' => $cleanupCount]);
+                        }
+                } catch (Throwable $e) {
+                        Log::warning('Error during temporary files cleanup', [
+                                'error' => $e->getMessage()
+                        ]);
                 }
         }
 }

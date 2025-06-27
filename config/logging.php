@@ -132,6 +132,54 @@ return [
                         'level'  => env('LOG_LEVEL', 'info'),
                         'max_bytes' => 5 * 1024 * 1024,
                 ],
+
+                'auth' => [
+                        'driver' => 'daily',
+                        'path'   => storage_path('logs/auth.log'),
+                        'level'  => env('LOG_LEVEL', 'debug'),
+                        'days'   => env('LOG_DAILY_DAYS', 7),
+                        'replace_placeholders' => true,
+                ],
+
+                'api' => [
+                        'driver' => 'daily',
+                        'path'   => storage_path('logs/api.log'),
+                        'level'  => env('LOG_LEVEL', 'debug'),
+                        'days'   => env('LOG_DAILY_DAYS', 7),
+                        'replace_placeholders' => true,
+                ],
+
+                'admin' => [
+                        'driver' => 'daily',
+                        'path'   => storage_path('logs/admin.log'),
+                        'level'  => env('LOG_LEVEL', 'debug'),
+                        'days'   => env('LOG_DAILY_DAYS', 14),
+                        'replace_placeholders' => true,
+                ],
+
+                'payment' => [
+                        'driver' => 'daily',
+                        'path'   => storage_path('logs/payment.log'),
+                        'level'  => env('LOG_LEVEL', 'debug'),
+                        'days'   => env('LOG_DAILY_DAYS', 30),
+                        'replace_placeholders' => true,
+                ],
+
+                'performance' => [
+                        'driver' => 'daily',
+                        'path'   => storage_path('logs/performance.log'),
+                        'level'  => env('LOG_LEVEL', 'info'),
+                        'days'   => env('LOG_DAILY_DAYS', 3),
+                        'replace_placeholders' => true,
+                ],
+
+                'security' => [
+                        'driver' => 'daily',
+                        'path'   => storage_path('logs/security.log'),
+                        'level'  => env('LOG_LEVEL', 'warning'),
+                        'days'   => env('LOG_DAILY_DAYS', 30),
+                        'replace_placeholders' => true,
+                ],
 		
 		'null' => [
 			'driver'  => 'monolog',

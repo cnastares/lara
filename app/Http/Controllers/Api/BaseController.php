@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\Base\SettingsTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Web\Front\Traits\CommonTrait;
 use App\Http\Controllers\Web\Front\Traits\EnvFileTrait;
+use Illuminate\Support\Str;
 
 class BaseController extends Controller
 {
@@ -30,6 +31,8 @@ class BaseController extends Controller
 	
 	public int $cacheExpiration = 3600; // In minutes (e.g. 60 * 60 for 1h)
 	public int $perPage = 10;
+	
+	protected string $requestId;
 	
 	public function __construct()
 	{
@@ -47,6 +50,8 @@ class BaseController extends Controller
 		
 		// Items per page
 		$this->perPage = getNumberOfItemsPerPage(null, request()->integer('perPage'));
+		
+		$this->requestId = request()->header('X-Request-Id') ?? Str::uuid()->toString();
 	}
 	
 	/**
@@ -63,5 +68,18 @@ class BaseController extends Controller
 		}
 		
 		return array_merge(parent::middleware(), $array);
+	}
+	
+	/**
+	 * Helper para respuestas JSON con request-id
+	 */
+	protected function jsonWithRequestId($data = [], $status = 200, $headers = [], $options = 0)
+	{
+		if (is_array($data)) {
+			$data['request_id'] = $this->requestId;
+		} elseif ($data instanceof \ArrayObject) {
+			$data['request_id'] = $this->requestId;
+		}
+		return response()->json($data, $status, $headers, $options);
 	}
 }

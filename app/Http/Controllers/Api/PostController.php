@@ -17,15 +17,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Requests\Front\PostRequest;
+use App\Http\Traits\LogsActivity;
 use App\Services\PostService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controllers\Middleware;
+use Throwable;
 
 /**
  * @group Listings
  */
 class PostController extends BaseController
 {
+	use LogsActivity;
+	
 	protected PostService $postService;
 	
 	/**
@@ -75,11 +79,25 @@ class PostController extends BaseController
 	 */
 	public function index(): JsonResponse
 	{
-		$params = [
-			'op' => request()->input('op'),
-		];
+		$this->logRequestStart('post.index', request()->only(['op', 'embed', 'sort', 'perPage']), 'api');
 		
-		return $this->postService->getEntries($params);
+		try {
+			$params = [
+				'op' => request()->input('op'),
+			];
+			
+			$result = $this->postService->getEntries($params);
+			
+			$this->logSuccess('post.index', [
+				'filters' => $params,
+				'result_count' => $result->getData()->data->meta->pagination->total ?? 0
+			], 'api');
+			
+			return $result;
+		} catch (Throwable $e) {
+			$this->logException('post.index', $e, ['op' => request()->input('op')], 'api');
+			throw $e;
+		}
 	}
 	
 	/**
@@ -103,12 +121,28 @@ class PostController extends BaseController
 	 */
 	public function show($id): JsonResponse
 	{
-		$params = [
-			'embed'    => request()->input('embed'),
-			'detailed' => (request()->input('detailed') == 1),
-		];
+		$this->logRequestStart('post.show', ['post_id' => $id, 'embed' => request()->input('embed'), 'detailed' => request()->input('detailed')], 'api');
 		
-		return $this->postService->getEntry($id, $params);
+		try {
+			$params = [
+				'embed'    => request()->input('embed'),
+				'detailed' => (request()->input('detailed') == 1),
+			];
+			
+			$result = $this->postService->getEntry($id, $params);
+			
+			$this->logSuccess('post.show', [
+				'post_id' => $id,
+				'embed' => $params['embed'],
+				'detailed' => $params['detailed'],
+				'found' => $result->getStatusCode() === 200
+			], 'api');
+			
+			return $result;
+		} catch (Throwable $e) {
+			$this->logException('post.show', $e, ['post_id' => $id], 'api');
+			throw $e;
+		}
 	}
 	
 	/**
@@ -150,7 +184,34 @@ class PostController extends BaseController
 	 */
 	public function store(PostRequest $request)
 	{
-		return $this->postService->store($request);
+		$inputData = $request->only(['title', 'category_id', 'country_code', 'city_id', 'admin_code', 'price', 'package_id', 'payment_method_id']);
+		$this->logRequestStart('post.store', $inputData, 'api');
+		
+		try {
+			$result = $this->withPerformanceLog('post.store', function() use ($request) {
+				return $this->postService->store($request);
+			}, 'api');
+			
+			$this->logSuccess('post.store', [
+				'title' => $request->input('title'),
+				'category_id' => $request->input('category_id'),
+				'country_code' => $request->input('country_code'),
+				'city_id' => $request->input('city_id'),
+				'price' => $request->input('price'),
+				'package_id' => $request->input('package_id'),
+				'response_status' => is_object($result) && method_exists($result, 'getStatusCode') ? $result->getStatusCode() : 'success'
+			], 'api');
+			
+			$this->logModelOperation('created', 'Post', null, [
+				'title' => $request->input('title'),
+				'category_id' => $request->input('category_id'),
+			], 'api');
+			
+			return $result;
+		} catch (Throwable $e) {
+			$this->logException('post.store', $e, $inputData, 'api');
+			throw $e;
+		}
 	}
 	
 	/**
@@ -195,7 +256,35 @@ class PostController extends BaseController
 	 */
 	public function update($id, PostRequest $request)
 	{
-		return $this->postService->update($id, $request);
+		$inputData = $request->only(['title', 'category_id', 'country_code', 'city_id', 'admin_code', 'price', 'package_id', 'payment_method_id']);
+		$this->logRequestStart('post.update', array_merge($inputData, ['post_id' => $id]), 'api');
+		
+		try {
+			$result = $this->withPerformanceLog('post.update', function() use ($id, $request) {
+				return $this->postService->update($id, $request);
+			}, 'api');
+			
+			$this->logSuccess('post.update', [
+				'post_id' => $id,
+				'title' => $request->input('title'),
+				'category_id' => $request->input('category_id'),
+				'country_code' => $request->input('country_code'),
+				'city_id' => $request->input('city_id'),
+				'price' => $request->input('price'),
+				'package_id' => $request->input('package_id'),
+				'response_status' => is_object($result) && method_exists($result, 'getStatusCode') ? $result->getStatusCode() : 'success'
+			], 'api');
+			
+			$this->logModelOperation('updated', 'Post', $id, [
+				'title' => $request->input('title'),
+				'category_id' => $request->input('category_id'),
+			], 'api');
+			
+			return $result;
+		} catch (Throwable $e) {
+			$this->logException('post.update', $e, array_merge($inputData, ['post_id' => $id]), 'api');
+			throw $e;
+		}
 	}
 	
 	/**
@@ -211,6 +300,28 @@ class PostController extends BaseController
 	 */
 	public function destroy(string $ids): JsonResponse
 	{
-		return $this->postService->destroy($ids);
+		$this->logRequestStart('post.destroy', ['post_ids' => $ids], 'api');
+		
+		try {
+			$result = $this->withPerformanceLog('post.destroy', function() use ($ids) {
+				return $this->postService->destroy($ids);
+			}, 'api');
+			
+			$idsArray = explode(',', $ids);
+			$this->logSuccess('post.destroy', [
+				'post_ids' => $ids,
+				'ids_count' => count($idsArray),
+				'response_status' => $result->getStatusCode()
+			], 'api');
+			
+			foreach ($idsArray as $id) {
+				$this->logModelOperation('deleted', 'Post', trim($id), [], 'api');
+			}
+			
+			return $result;
+		} catch (Throwable $e) {
+			$this->logException('post.destroy', $e, ['post_ids' => $ids], 'api');
+			throw $e;
+		}
 	}
 }

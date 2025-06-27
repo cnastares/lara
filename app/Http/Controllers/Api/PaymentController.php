@@ -17,14 +17,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Requests\Front\PackageRequest;
+use App\Http\Traits\LogsActivity;
 use App\Services\PaymentService;
 use Illuminate\Http\JsonResponse;
+use Throwable;
 
 /**
  * @group Payments
  */
 class PaymentController extends BaseController
 {
+	use LogsActivity;
+	
 	protected PaymentService $paymentService;
 	
 	/**
@@ -54,15 +58,30 @@ class PaymentController extends BaseController
 	 */
 	public function index(?int $payableId = null): JsonResponse
 	{
-		$params = [
-			'perPage'     => (int)request()->input('perPage'),
-			'embed'       => request()->input('embed'),
-			'isValid'     => (request()->input('valid') == 1),
-			'isActive'    => (request()->input('active') == 1),
-			'paymentType' => request()->segment(3),
-		];
+		$this->logRequestStart('payment.index', request()->only(['perPage', 'embed', 'valid', 'active']), 'payment');
 		
-		return $this->paymentService->getEntries($payableId, $params);
+		try {
+			$params = [
+				'perPage'     => (int)request()->input('perPage'),
+				'embed'       => request()->input('embed'),
+				'isValid'     => (request()->input('valid') == 1),
+				'isActive'    => (request()->input('active') == 1),
+				'paymentType' => request()->segment(3),
+			];
+			
+			$result = $this->paymentService->getEntries($payableId, $params);
+			
+			$this->logSuccess('payment.index', [
+				'payable_id' => $payableId,
+				'filters' => $params,
+				'result_count' => $result->getData()->data->meta->pagination->total ?? 0
+			], 'payment');
+			
+			return $result;
+		} catch (Throwable $e) {
+			$this->logException('payment.index', $e, ['payable_id' => $payableId], 'payment');
+			throw $e;
+		}
 	}
 	
 	/**
@@ -80,11 +99,26 @@ class PaymentController extends BaseController
 	 */
 	public function show($id): JsonResponse
 	{
-		$params = [
-			'embed' => request()->input('embed'),
-		];
+		$this->logRequestStart('payment.show', ['payment_id' => $id, 'embed' => request()->input('embed')], 'payment');
 		
-		return $this->paymentService->getEntry($id, $params);
+		try {
+			$params = [
+				'embed' => request()->input('embed'),
+			];
+			
+			$result = $this->paymentService->getEntry($id, $params);
+			
+			$this->logSuccess('payment.show', [
+				'payment_id' => $id,
+				'embed' => $params['embed'],
+				'found' => $result->getStatusCode() === 200
+			], 'payment');
+			
+			return $result;
+		} catch (Throwable $e) {
+			$this->logException('payment.show', $e, ['payment_id' => $id], 'payment');
+			throw $e;
+		}
 	}
 	
 	/**
@@ -108,10 +142,30 @@ class PaymentController extends BaseController
 	 */
 	public function store(PackageRequest $request): JsonResponse
 	{
-		$params = [
-			'payableType' => $request->input('payable_type'),
-		];
+		$inputData = $request->only(['country_code', 'payable_id', 'payable_type', 'package_id', 'payment_method_id']);
+		$this->logRequestStart('payment.store', $inputData, 'payment');
 		
-		return $this->paymentService->store($request, $params);
+		try {
+			$params = [
+				'payableType' => $request->input('payable_type'),
+			];
+			
+			$result = $this->withPerformanceLog('payment.store', function() use ($request, $params) {
+				return $this->paymentService->store($request, $params);
+			}, 'payment');
+			
+			$this->logSuccess('payment.store', [
+				'payable_id' => $request->input('payable_id'),
+				'payable_type' => $request->input('payable_type'),
+				'package_id' => $request->input('package_id'),
+				'payment_method_id' => $request->input('payment_method_id'),
+				'response_status' => $result->getStatusCode()
+			], 'payment');
+			
+			return $result;
+		} catch (Throwable $e) {
+			$this->logException('payment.store', $e, $inputData, 'payment');
+			throw $e;
+		}
 	}
 }

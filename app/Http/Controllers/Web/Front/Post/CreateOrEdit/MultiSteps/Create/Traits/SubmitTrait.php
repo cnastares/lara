@@ -27,6 +27,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 trait SubmitTrait
 {
@@ -38,6 +39,8 @@ trait SubmitTrait
 	 */
 	protected function storeInputDataInDatabase(PostRequest|PhotoRequest|PackageRequest $request): RedirectResponse
 	{
+		$requestId = $request->header('X-Request-Id') ?? Str::uuid()->toString();
+		
 		// Get all saved input data
 		$postInput = (array)session('postInput');
 		$picturesInput = (array)session('picturesInput');
@@ -48,7 +51,8 @@ trait SubmitTrait
 			'table_columns' => Schema::getColumnListing('posts'),
 			'image_related_columns' => array_filter(Schema::getColumnListing('posts'), function($column) {
 				return strpos(strtolower($column), 'image') !== false || strpos(strtolower($column), 'photo') !== false || strpos(strtolower($column), 'picture') !== false;
-			})
+			}),
+			'request_id' => $requestId,
 		]);
 		
 		// AGREGAR LOG: Verificar configuración de storage
@@ -64,7 +68,8 @@ trait SubmitTrait
 			'temporary_dir_writable' => is_writable(storage_path('app/temporary')),
 			'public_storage_path' => storage_path('app/public'),
 			'public_storage_exists' => is_dir(storage_path('app/public')),
-			'public_storage_writable' => is_writable(storage_path('app/public'))
+			'public_storage_writable' => is_writable(storage_path('app/public')),
+			'request_id' => $requestId,
 		]);
 		
 		// AGREGAR LOG: Verificar tablas relacionadas con imágenes

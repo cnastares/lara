@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\BaseController;
 use App\Services\Auth\App\Http\Requests\LoginRequest;
 use App\Services\Auth\LoginService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @group Authentication
@@ -53,7 +54,12 @@ class LoginController extends BaseController
 	 */
 	public function login(LoginRequest $request): JsonResponse
 	{
-		return $this->loginService->login($request);
+		$result = $this->loginService->login($request);
+		Log::info('API User login', [
+			'ip' => $request->ip(),
+			'request_id' => $this->requestId,
+		]);
+		return $this->jsonWithRequestId($result->getData(true), $result->getStatusCode());
 	}
 	
 	/**
@@ -69,6 +75,11 @@ class LoginController extends BaseController
 	 */
 	public function logout($userId): JsonResponse
 	{
-		return $this->loginService->logout($userId);
+		$result = $this->loginService->logout($userId);
+		Log::info('API User logout', [
+			'user_id' => $userId,
+			'request_id' => $this->requestId,
+		]);
+		return $this->jsonWithRequestId($result->getData(true), $result->getStatusCode());
 	}
 }
