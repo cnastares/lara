@@ -131,9 +131,10 @@ trait SubmitTrait
 			'pictures_input' => $picturesInput ?? [],
 		]);
 		
-		$inputArray['pictures'] = [];
-		if (!empty($picturesInput)) {
-			foreach ($picturesInput as $index => $filePath) {
+                $inputArray['pictures'] = [];
+                $uploadedFiles = [];
+                if (!empty($picturesInput)) {
+                        foreach ($picturesInput as $index => $filePath) {
 				// AGREGAR LOG: DURANTE el procesamiento de cada imagen
 				Log::info('Processing individual image', [
 					'index' => $index,
@@ -184,10 +185,11 @@ trait SubmitTrait
 				}
 				
 				if (!empty($filePath)) {
-					if (hasTemporaryPath($filePath)) {
-						try {
-							$uploadedFile = Upload::fromPath($filePath);
-							$inputArray['pictures'][] = $uploadedFile;
+                                        if (hasTemporaryPath($filePath)) {
+                                                try {
+                                                        $uploadedFile = Upload::fromPath($filePath);
+                                                        $inputArray['pictures'][] = $uploadedFile;
+                                                        $uploadedFiles[] = $uploadedFile;
 							
 							Log::info('Successfully created Upload object from path', [
 								'index' => $index,
@@ -229,22 +231,24 @@ trait SubmitTrait
 		
 		$inputArray = array_merge($inputArray, $paymentInput);
 		
-		$request->merge($inputArray);
-		
-		// Set the pictures files in the current request (from the saved input variable)
-		// Note: In that case file needs to be retrieved using $request->files->all() instead of $request->allFiles()
-		$uploadedPictures = $inputArray['pictures'] ?? [];
-		if (!empty($uploadedPictures)) {
-			if (is_array($uploadedPictures)) {
-				$request->files->set('pictures', $uploadedPictures);
-				
-				Log::info('Set pictures in request files', [
-					'pictures_count' => count($uploadedPictures),
-					'request_has_pictures' => $request->hasFile('pictures'),
-					'request_files_count' => count($request->allFiles()),
-				]);
-			}
-		}
+                $request->merge($inputArray);
+
+                // Set the pictures files in the current request (from the saved input variable)
+                // Note: In that case file needs to be retrieved using $request->files->all() instead of $request->allFiles()
+                if (!empty($uploadedFiles)) {
+                        $request->files->set('pictures', $uploadedFiles);
+
+                        Log::info('Set pictures in request files', [
+                                'pictures_count' => count($uploadedFiles),
+                                'request_has_pictures' => $request->hasFile('pictures'),
+                                'request_files_count' => count($request->allFiles()),
+                        ]);
+
+                        Log::debug('Pictures in request', [
+                                'count' => $request->files->count(),
+                                'keys'  => array_keys($request->files->all()),
+                        ]);
+                }
 		
 		// AGREGAR LOG: ANTES de guardar en BD
 		Log::info('About to call postService->store', [
