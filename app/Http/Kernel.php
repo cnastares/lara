@@ -129,8 +129,9 @@ class Kernel
 			'installed'     => \App\Http\Middleware\Installed::class,
 			'clearance'     => \App\Http\Middleware\Clearance::class,
 			'no.http.cache' => \App\Http\Middleware\NoHttpCache::class,
-			'only.ajax'     => \App\Http\Middleware\OnlyAjax::class,
-		]);
+                        'only.ajax'     => \App\Http\Middleware\OnlyAjax::class,
+                        'upload.validation' => \App\Http\Middleware\UploadValidationMiddleware::class,
+                ]);
 		
 		/*
 		 * The priority-sorted list of middleware
