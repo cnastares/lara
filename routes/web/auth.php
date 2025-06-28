@@ -84,6 +84,9 @@ Route::controller(TwoFactorController::class)
 // Logout
 Route::get('logout', [LoginController::class, 'logout']);
 
+// Session Check (AJAX endpoint for monitoring user authentication status)
+Route::get('user/check-session', [LoginController::class, 'checkSession'])->name('auth.check.session');
+
 // VERIFICATION
 Route::controller(VerificationController::class)
 	->prefix('verify')

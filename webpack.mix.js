@@ -46,6 +46,9 @@ mix.combine([
 mix.combine(['public/assets/resources/css/app.css'], 'public/dist/front/styles.css');
 mix.combine(['public/assets/resources/css/app.rtl.css'], 'public/dist/front/styles.rtl.css');
 mix.combine([
+	'public/assets/js/auto-fix-errors.js',
+	'public/assets/js/init-polyfills.js',
+	'public/assets/js/picture-in-picture-polyfill.js',
 	'public/assets/js/helpers/vanilla.js',
 	'public/assets/js/helpers/uri.js',
 	'public/assets/js/helpers/cookieManager.js',

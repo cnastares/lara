@@ -220,4 +220,40 @@ class LoginController extends FrontController
 		
 		return redirect()->to($uriPath);
 	}
+	
+	/**
+	 * Check user session status (AJAX endpoint)
+	 * 
+	 * @return \Illuminate\Http\JsonResponse
+	 */
+	public function checkSession(): \Illuminate\Http\JsonResponse
+	{
+		$user = auth()->user();
+		$isAuthenticated = !is_null($user);
+		
+		$response = [
+			'authenticated' => $isAuthenticated,
+			'status' => $isAuthenticated ? 'authenticated' : 'unauthenticated',
+			'timestamp' => now()->toISOString(),
+		];
+		
+		if ($isAuthenticated) {
+			$response['user'] = [
+				'id' => $user->getAuthIdentifier(),
+				'name' => $user->name ?? null,
+				'email' => $user->email ?? null,
+			];
+			
+			// Información adicional de sesión si está disponible
+			if (session()->getId()) {
+				$response['session_id'] = session()->getId();
+			}
+			
+			// Tiempo de vida de la sesión
+			$lifetime = config('session.lifetime', 120) * 60; // en segundos
+			$response['expires_at'] = now()->addSeconds($lifetime)->toISOString();
+		}
+		
+		return response()->json($response);
+	}
 }

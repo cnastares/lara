@@ -221,8 +221,18 @@
 	@include('auth.layouts.js.translations')
 @endif
 
+{{-- JavaScript Error Fixes (CRITICAL: Load before all other scripts) --}}
+<script src="{{ url('assets/js/auto-fix-errors.js') }}"></script>
+<script src="{{ url('assets/js/init-polyfills.js') }}"></script>
+<script src="{{ url('assets/js/picture-in-picture-polyfill.js') }}"></script>
+
 {{-- App JS files (Handled by Mix) --}}
 <script src="{{ url(mix('dist/front/scripts.js')) }}"></script>
+
+{{-- Session Monitor (Solo para usuarios autenticados) --}}
+@auth
+<script src="{{ url('assets/js/session-monitor.js') }}"></script>
+@endauth
 
 {{-- Lazy Loading JS --}}
 @if (config('settings.optimization.lazy_loading_activation') == 1)
